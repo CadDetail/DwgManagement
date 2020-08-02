@@ -1,6 +1,7 @@
 package cn.keyi.bye.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,8 +46,11 @@ public class ArtifactController {
 		int pageSize = Integer.parseInt(request.getParameter("length"));	// 页大小
 		pageNumber = pageSize <= 0 ? 1 : pageNumber / pageSize;				// 计算页码
 		String artifactName = request.getParameter("artifactName");			// 工件名称
-		short productFlag = (short) Integer.parseInt(request.getParameter("productFlag"));	// 工件类别	
-		PageRequest pageable = PageRequest.of(pageNumber, pageSize);
+		short productFlag = (short) Integer.parseInt(request.getParameter("productFlag"));	// 工件类别
+		String orderColumn = request.getParameter("order[0][column]");		// 排序字段编号
+		String orderDir = request.getParameter("order[0][dir]");			// 排序方式
+		String orderField = request.getParameter("columns["+orderColumn+"][data]");	//排序字段名称，这里要注意与数据库字段一致
+		PageRequest pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.fromString(orderDir), orderField));
 		Page<Artifact> page = artifactService.getArtifactsByPage(artifactName, productFlag, pageable);
 		// 下面代码为满足DataTable插件要求而进行的组装
 		Map<String, Object> map = new HashMap<String, Object>();

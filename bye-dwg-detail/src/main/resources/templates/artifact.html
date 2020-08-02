@@ -76,6 +76,8 @@
 		              <table id="tableArtifacts" class="table table-bordered table-hover table-striped no-footer">
 						<thead>
 				            <tr>
+				                <th>Id</th>
+				                <th>#</th>
 				                <th>名称</th>
 				                <th>图号</th>
 				                <th>重量</th>
@@ -188,7 +190,7 @@
 				serverSide: true,
 				autoWidth : false,
 				searching : false,
-				ordering  : false,
+				ordering  : true,
 				pagingType: "full",
 				language: {
 			        url: '/plugins/datatables/datatables-bs4/language-zh.json'
@@ -202,12 +204,14 @@
 		        	}
 		        },
 				columns: [
+					{ data: 'artifactId', visible: false},
+					{ data: null, orderable: false},
 					{ data: 'artifactName' },
 		            { data: 'artifactCode' },
 		            { data: 'weight' },
-		            { data: 'materialName' },
-		            { data: 'artifactMemo' },
-		            { data: null, "render": function(data, type, row, meta) {
+		            { data: 'materialName', orderable: false},
+		            { data: 'artifactMemo', orderable: false},
+		            { data: null, orderable: false, "render": function(data, type, row, meta) {
 		            	var htmlOpt = "<div class=\"row\">";
 		            	htmlOpt += "<button type='button' class='btn btn-info btn-sm'   onclick='editArtifact("   + JSON.stringify(row) + ")'><i class='fas fa-pencil-alt'></i>&nbsp;编辑</button>&nbsp;";
 		            	htmlOpt += "<button type='button' class='btn btn-danger btn-sm' onclick='deleteArtifact(" + JSON.stringify(row) + ")'><i class='fas fa-trash     '></i>&nbsp;删除</button>&nbsp;";
@@ -239,6 +243,14 @@
 			// 将导出到Excel和打印按钮放在指定位置
 			datatable.buttons( 0, null ).containers().appendTo( '#divButtons' );
 			
+			// 为DataTable添加序号列
+			datatable.on('draw.dt', function() {
+			      //给第一列编号
+			      datatable.column(1).nodes().each(function(cell, i) {
+			          cell.innerHTML = "<b>" + (i+1) + "</b>";
+			      });
+			  });
+			
 			// 查询按钮、复选框事件
 			$("#btnFindArtifacts, #chkOnlyProduct").click(function() {
 				var flag = $("#chkOnlyProduct").is(":checked") ? 0 : -1;
@@ -260,7 +272,7 @@
 		}
 		
 		function newArtifact() {
-			$("#modal-artifact input").val();
+			$("#modal-artifact input").val("");
 			$("#dlgArtifactTitle").html("新增工件");
 			$("#modal-artifact").modal("show");
 		}
