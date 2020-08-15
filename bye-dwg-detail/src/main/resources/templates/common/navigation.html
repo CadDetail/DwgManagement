@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
@@ -35,14 +35,14 @@
                 <!-- Messages Dropdown Menu -->
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-toggle="dropdown" href="#">
-                    	<img src="/img/user1-128x128.jpg" alt="User Avatar" class="img-sm img-circle">
+                    	<img id="imgUserPhoto" src="/img/user1-128x128.jpg" alt="User Avatar" class="img-sm img-circle">
                     </a>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                         <!-- Profile Image -->
 			            <div class="card card-outline card-info" style="margin-bottom:0">
 			              <div class="card-body box-profile">
 			                <div class="text-center">
-			                  <img class="profile-user-img img-fluid img-circle"
+			                  <img id="imgUserProfile" class="profile-user-img img-fluid img-circle"
 			                       src="/img/user1-128x128.jpg"
 			                       alt="用户">
 			                </div>

@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
+import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
+
 
 @Configuration
 public class ShiroConfig {
@@ -34,6 +36,7 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/img/**", "anon");
 		filterChainDefinitionMap.put("/js/**", "anon");
 		filterChainDefinitionMap.put("/plugins/**", "anon");
+		filterChainDefinitionMap.put("/files/**", "anon");
 		filterChainDefinitionMap.put("/logout", "logout");	// 退出过滤器，具体退出代码由 Shiro 自身实现	
 		filterChainDefinitionMap.put("/**", "authc");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);	// 拦截器
@@ -100,5 +103,14 @@ public class ShiroConfig {
 		//r.setWarnLogCategory("example.MvcLogger");     // No default
 		return r;
 	}
+	
+	/**
+	 * 为了在thymeleaf中使用shiro的自定义tag
+	 * @return
+	 */
+	@Bean(name = "shiroDialect")
+    public ShiroDialect shiroDialect(){
+        return new ShiroDialect();
+    }
 	
 }

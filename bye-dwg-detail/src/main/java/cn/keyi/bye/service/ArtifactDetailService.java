@@ -47,6 +47,18 @@ public class ArtifactDetailService {
 	}
 	
 	/**
+	 * comment: 根据parentArtifactId和artifactId查询明细记录
+	 * author : 兴有林栖
+	 * date   : 2020-8-15
+	 * @param masterId
+	 * @param salveId
+	 * @return
+	 */
+	public List<ArtifactDetail> getDetailByMasterIdAndSlaveId(Long masterId, Long salveId) {
+		return artifactDetailDao.findByMasterArtifactIdAndSlaveArtifactId(masterId, salveId);
+	}
+	
+	/**
 	 * comment: 指定一个工件，使用递归方式获取从属于它的所有下级工件，并组装成一个列表
 	 * author : 兴有林栖
 	 * date   : 2020-8-1
@@ -70,4 +82,31 @@ public class ArtifactDetailService {
 		return;
 	}
 	
+	/**
+	 * comment: 删除指定的明细记录
+	 * author : 兴有林栖
+	 * date   : 2020-8-14
+	 * @param detailId
+	 * @return
+	 */
+	public String deleteArtifactDetail(Long detailId) {
+		String rslt = "";
+		try {
+			artifactDetailDao.deleteById(detailId);
+		} catch (Exception e) {		
+			rslt = e.getMessage();
+		}
+		return rslt;
+	}
+	
+	
+	public String saveArtifactDetail(ArtifactDetail artifactDetail) {
+		String rslt = "";
+		try {
+			artifactDetailDao.save(artifactDetail);
+		} catch (Exception e) {
+			rslt = e.getMessage();
+		}
+		return rslt;
+	}
 }

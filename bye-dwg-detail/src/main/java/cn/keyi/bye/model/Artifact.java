@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -16,14 +17,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name="artifact")
 public class Artifact  implements Serializable {
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "artifactId")
 	private Long artifactId;
 	// 工件（产品）名称
 	@Column(name = "artifactName")
 	private String artifactName;
 	// 产品（工件）代号
-	@Column(name = "artifactCode")
+	@Column(unique = true, name = "artifactCode")
 	private String artifactCode;
 	// 重量
 	@Column(name = "weight")
@@ -37,6 +38,9 @@ public class Artifact  implements Serializable {
 	// 用于标记此工件是否是顶层工件，即产品。0-产品，非0-工件
 	@Column(name = "productFlag")
 	private Short productFlag = 1;
+	// 产品型号
+	@Column(name = "productModel")
+	private String productModel;
 	// 标记此工件是否可以继续分解（拥有下一级明细），目前代码以8ZT开头的工件为不可分解，其它工件为可分解
 	@Column(name = "canBeSplit")
 	private Boolean canBeSplit = Boolean.TRUE;
@@ -93,6 +97,12 @@ public class Artifact  implements Serializable {
 	}
 	public void setProductFlag(Short productFlag) {
 		this.productFlag = productFlag;
+	}
+	public String getProductModel() {
+		return productModel;
+	}
+	public void setProductModel(String productModel) {
+		this.productModel = productModel;
 	}
 	public Boolean getCanBeSplit() {
 		return canBeSplit;

@@ -14,5 +14,7 @@ public interface ArtifactDetailDao extends JpaRepository<ArtifactDetail, Long> {
 	List<ArtifactDetail> findByMasterArtifactId(Long masterId);	
 	// 根据指定的工件ID以分页的形式查询其包含的下层（单层）工件组成明细
 	Page<ArtifactDetail> findByMasterArtifactId(Long masterId, Pageable pageable);	
+	// 根据parentArtifactId和artifactId查询明细记录
+	List<ArtifactDetail> findByMasterArtifactIdAndSlaveArtifactId(Long masterId, Long salveId);
 	
 }

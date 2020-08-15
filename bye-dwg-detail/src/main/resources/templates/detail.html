@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head th:replace="common/head :: common_head(~{::title}, ~{})">
     <title>产品明细</title>
 </head>
@@ -40,9 +40,8 @@
 	                <div class="card card-info card-outline">
 			          <div class="card-header">
 						    <div class="float-right">						    
-						    	<div class="d-inline"><button class="btn btn-info" type="button" id="btnNewDetail"   ><i class="fa fa-wrench"></i>&nbsp;新增明细</button></div>
-						    	<div class="d-inline"><button class="btn btn-success" type="button" id="btnExportDetail"><i class="fa fa-download"></i>&nbsp;导出到Excel</button></div>
-						    	<div class="d-inline"><button class="btn btn-secondary" type="button" id="btnPrintDetail" ><i class="fa fa-print"></i>&nbsp;打印</button></div>
+						    	<div class="d-inline" shiro:hasAnyPermissions="detail:add"><button class="btn btn-info" type="button" id="btnNewDetail" onclick="newDetail()"><i class="fa fa-wrench"></i>&nbsp;新增明细</button></div>
+						    	<div class="d-inline" shiro:hasAnyPermissions="detail:export,detail:print"><button class="btn btn-secondary" type="button" id="btnExportDetail"><i class="fa fa-download"></i>&nbsp;导出到Excel</button></div>
 						    </div>
 			          </div>
 			          <!-- 这里放各tabs列出的明细表格 -->
@@ -59,6 +58,152 @@
             <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
+        
+        <!-- 新建或编辑明细对话框 -->
+		<div class="modal fade" id="modal-artifactDetail">
+	          <div class="modal-dialog">
+		          <div class="modal-content">
+		            <div class="modal-header">
+		              <h4 class="modal-title" id="dlgDetailTitle">管理明细</h4>
+		              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		                <span aria-hidden="true">&times;</span>
+		              </button>
+		            </div>		          
+			        <!-- form start -->
+		            <form class="form-horizontal" id="frmDetail">
+		                <div class="card-body">
+		                	<div class="form-group row">
+		                    <label for="dlgArtifactCode" class="col-sm-2 col-form-label">图号：</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control is-warning" id="dlgArtifactCode" name="artifactCode" placeholder="图号">
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgArtifactName" class="col-sm-2 col-form-label">名称：</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control" id="dlgArtifactName" name="artifactName" placeholder="名称" readonly>
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgNumber" class="col-sm-2 col-form-label">数量：</label>
+		                    <div class="col-sm-10">
+		                      <input type="number" class="form-control is-warning" id="dlgNumber" name="number" placeholder="数量">
+		                    </div>
+		                  </div>	                  
+		                  <div class="form-group row">
+		                  	<label for="" class="col-sm-2 col-form-label">分解：</label>
+		                    <div class="col-sm-10">
+		                      <div class="icheck-info">
+		                        <input type="checkbox" class="form-check-input" id="dlgNeedSplit" name="needSplit">
+		                        <label class="form-check-label" for="dlgNeedSplit">需要进一步拆分</label>
+		                      </div>
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgDetailMemo" class="col-sm-2 col-form-label">备注：</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control" id="dlgDetailMemo" name="detailMemo" placeholder="备注">
+		                    </div>
+		                  </div>
+		                </div>
+		                <!-- /.card-body -->
+		                <div class="card-footer">
+		                  <button type="button" class="btn btn-info" id="btnSaveDetail">保存</button>
+		                  <button type="button" class="btn btn-default float-right" data-dismiss="modal">取消</button>
+		                </div>
+		                <!-- /.card-footer -->
+		            </form>
+		          
+		          </div>
+		          <!-- /.modal-content -->
+		        </div>
+		        <!-- /.modal-dialog -->
+	    </div>
+	    <!-- /.modal -->
+	    
+	    <!-- 会签对话框 -->
+		<div class="modal fade" id="modal-inspect">
+	          <div class="modal-dialog">
+		          <div class="modal-content">
+		            <div class="modal-header">
+		              <h4 class="modal-title" id="dlgInspectTitle">明细会签</h4>
+		              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		                <span aria-hidden="true">&times;</span>
+		              </button>
+		            </div>		          
+			        <!-- form start -->
+		            <form class="form-horizontal" id="frmInspect">
+		                <div class="card-body">
+		                	<div class="form-group row">
+		                    <label for="dlgInspectArtifactCode" class="col-sm-2 col-form-label">图号：</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control" id="dlgInspectArtifactCode" name="nnspectArtifactCode" placeholder="图号" readonly>
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgInspectArtifactName" class="col-sm-2 col-form-label">名称：</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control" id="dlgInspectArtifactName" name="inspectArtifactName" placeholder="名称" readonly>
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgDimension" class="col-sm-2 col-form-label">尺寸：</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control" id="dlgDimension" name="dimension" placeholder="参考尺寸">
+		                    </div>
+		                  </div>	                  
+		                  <div class="form-group row">
+		                    <label for="dlgUnit" class="col-sm-2 col-form-label">单位：</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control" id="dlgUnit" name="unit" placeholder="单位">
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgQuota" class="col-sm-2 col-form-label">定额：</label>
+		                    <div class="col-sm-10">
+		                      <input type="number" class="form-control" id="dlgQuota" name="quota" placeholder="定额">
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgWorkingSteps" class="col-sm-2 col-form-label">工序：</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control" id="dlgWorkingSteps" name="workingSteps" placeholder="工序">
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgClassificationSign" class="col-sm-2 col-form-label">分类：</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control" id="dlgClassificationSign" name="classificationSign" placeholder="分类标识">
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgProcessSign" class="col-sm-2 col-form-label">处理：</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control" id="dlgProcessSign" name="processSign" placeholder="处理标识">
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgInspector" class="col-sm-2 col-form-label">会签：</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control" id="dlgInspector" name="inspector" placeholder="会签人">
+		                    </div>
+		                  </div>
+		                  
+		                </div>
+		                <!-- /.card-body -->
+		                <div class="card-footer">
+		                  <button type="button" class="btn btn-info" id="btnSaveInspect">保存</button>
+		                  <button type="button" class="btn btn-default float-right" data-dismiss="modal">取消</button>
+		                </div>
+		                <!-- /.card-footer -->
+		            </form>
+		          
+		          </div>
+		          <!-- /.modal-content -->
+		        </div>
+		        <!-- /.modal-dialog -->
+	    </div>
+	    <!-- /.modal -->
 
         <!-- footer -->
         <footer th:replace="common/footer :: common_footer"></footer>        
@@ -66,6 +211,8 @@
     <!-- ./wrapper -->    
 	<div th:replace="common/footer :: common_js"></div>
 	<script type="text/javascript">
+		var saveUrl = "", activeTab = -1, inspectDetailId = -1;
+	
 		// 创建info-box
 		function createInfoBox(data) {
 			var html = '';
@@ -93,7 +240,9 @@
 			html += '      <span class="info-box-icon bg-warning"><i class="far fa-hourglass"></i></span>';
 			html += '      <div class="info-box-content">';
 			html += '        <span class="info-box-text">重量</span>';
-			html += '        <span class="info-box-number">' + data.artifact.weight + '</span>';
+			var weight = data.artifact.weight;
+			if(weight == null) { weight = "未知"; }
+			html += '        <span class="info-box-number">' + weight + '</span>';
 			html += '      </div>';
 			html += '    </div>';
 			html += '  </div>';
@@ -112,6 +261,7 @@
 	
 		// 创建一个表格
 		function createTable(tableId, data) {
+			var permissions = sessionStorage.getItem("permissions");
 			var html = '<div class="table-responsive">';
 			html += '<table class="table table-hover table-striped" id="' + tableId + '">';
 			html += '<thead>';
@@ -128,7 +278,7 @@
 			html += '</thead>';
 			html += '<tbody>';
 			$.each(data, function(i, item) {
-				html += '<tr>';
+				html += '<tr id="tr' + item.detailId + '">';
 				html += '<th scope="row">' + (i+1) + '</th>';
 				if(item.needSplit) {					
 					html += '<td><a href="#" onclick="showMatchingTab(\'tab'+ item.slave.artifactId + '\')">' + item.slave.artifactName + '</a></td>';
@@ -136,18 +286,29 @@
 					html += '<td>' + item.slave.artifactName + '</td>';
 				}
 				html += '<td>' + item.slave.artifactCode + '</td>';
-				html += '<td>' + item.slave.weight + '</td>';
+				var weight = item.slave.weight;
+				if(weight == null) { weight = ""; };
+				html += '<td>' + weight + '</td>';
 				html += '<td>' + item.number + '</td>';
-				html += '<td>' + item.slave.materialName + '</td>';
+				var materialName = item.slave.materialName;
+				if(materialName == null) { materialName = ""; }
+				html += '<td>' + materialName + '</td>';
 				if(item.needSplit) {
 					html += '<td><span class="badge bg-secondary">' + item.needSplit + '</span></td>';
 				} else {
 					html += '<td>' + item.needSplit + '</td>';
 				}
-				html += '<td>';
-				html += '<button type="button" class="btn btn-info btn-sm" onclick="editDetail(\'' + item.detailId + '\')"><i class="fas fa-pencil-alt"></i>&nbsp;编辑</button>&nbsp;';
-				html += '<button type="button" class="btn btn-danger btn-sm" onclick="deleteDetail(\'' + item.detailId + '\')"><i class="fas fa-trash"></i>&nbsp;删除</button>&nbsp;';
-				html += '</td>';
+				html += '<td>';				
+            	if(permissions.indexOf("detail:edit") != -1) {
+					html += "<button type='button' class='btn btn-info btn-sm' onclick='editDetail(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt'></i>&nbsp;编辑</button>&nbsp;";
+            	}
+            	if(permissions.indexOf("detail:del") != -1) {
+					html += '<button type="button" class="btn btn-danger btn-sm" onclick="deleteDetail(' + item.detailId + ')"><i class="fas fa-trash"></i>&nbsp;删除</button>&nbsp;';
+            	}
+            	if(permissions.indexOf("detail:check") != -1) {
+					html += "<button type='button' class='btn btn-success btn-sm' onclick='doInspect(" + JSON.stringify(item) + ")'><i class='fas fa-paw'></i>&nbsp;会签</button>&nbsp;";
+            	}
+            	html += '</td>';
 				html += '</tr>';
 			});
 			html += '</tbody>';
@@ -160,55 +321,204 @@
 			$("#" + tabId).tab('show');
 		}
 		
-		function editDetail(detailId) {
-			alert(detailId);
+		function newDetail() {
+			saveUrl = "/detail/saveArtifactDetail";
+			$("#modal-artifactDetail input").val("");
+			$("#dlgDetailTitle").html("新增明细");
+			$("#modal-artifactDetail").modal("show");
+		}
+		
+		function editDetail(detail) {
+			saveUrl = "/detail/saveArtifactDetail?id=" + detail.detailId;
+			$("#dlgArtifactName").val(detail.slave.artifactName);
+			$("#dlgArtifactCode").val(detail.slave.artifactCode);
+			$("#dlgNumber").val(detail.number);
+			$("#dlgNeedSplit").prop("checked", detail.needSplit);
+			$("#dlgDetailMemo").val(detail.detailMemo);
+			$("#dlgDetailTitle").html("修改明细");
+			$("#modal-artifactDetail").modal("show");
 		}
 		
 		function deleteDetail(detailId) {
-			alert(detailId);
+			Swal.fire({
+				  title: '确定吗？',
+				  text: "一旦删除，数据将不可恢复！",
+				  icon: 'warning',
+				  showCancelButton: true,
+				  confirmButtonColor: '#3085d6',
+				  cancelButtonColor: '#d33',
+				  confirmButtonText: '确定',
+				  cancelButtonText: '取消'
+				}).then((result) => {
+				  if (result.value) {
+					  $.post("/detail/deleteDetail", {detailId: detailId}, function(data){
+						  if(data.status == 1) {
+							  // 在表格中删除对应的数据行
+							  $("table #tr" + detailId).remove();
+						  } else {							  
+							  Swal.fire('失败！', data.message, 'error');
+						  }
+					  });
+				  }
+				});
+		}
+		
+		function doInspect(detail) {
+			inspectDetailId = detail.detailId;
+			$("#dlgInspectArtifactCode").val(detail.slave.artifactCode);
+			$("#dlgInspectArtifactName").val(detail.slave.artifactName);
+			$("#dlgDimension").val(detail.dimension);
+			$("#dlgUnit").val(detail.unit);
+			$("#dlgQuota").val(detail.quota);
+			$("#dlgWorkingSteps").val(detail.workingSteps);
+			$("#dlgClassificationSign").val(detail.classificationSign);
+			$("#dlgProcessSign").val(detail.processSign);
+			var inspector = detail.inspector;
+			if(inspector == null || inspector == "") {
+				inspector = $("#useralias").html();
+			}
+			$("#dlgInspector").val(inspector);
+			$("#modal-inspect").modal("show");
+		}
+		
+		function loadData(masterId) {
+			$.ajax({
+				type: "GET",
+				url:  "/artifact/findRecursiveDetail",
+				data: {masterId: masterId},
+				success: function(result) {						
+					var navitem = '<ul class="nav nav-tabs" id="tabDetail" role="tablist">';
+					var content = '<div class="tab-content" id="tabContent">';
+					$.each(result, function(i, item) {					
+						navitem += '<li class="nav-item">';
+						if(i == 0) {
+							navitem += '  <a class="nav-link active" id="tab' + item.artifact.artifactId + '" data-toggle="pill" href="#content' + item.artifact.artifactId + '" role="tab" aria-controls="content' + item.artifact.artifactId + '" aria-selected="true">' + item.artifact.artifactName + '</a>';
+						} else {
+							navitem += '  <a class="nav-link" id="tab' + item.artifact.artifactId + '" data-toggle="pill" href="#content' + item.artifact.artifactId + '" role="tab" aria-controls="content' + item.artifact.artifactId + '" aria-selected="false">' + item.artifact.artifactName + '</a>';
+						}							
+						navitem += '</li>';
+						if(i == 0) {
+							content += '<div class="tab-pane fade show active" id="content' + item.artifact.artifactId + '" role="tabpanel" aria-labelledby="tab' + item.artifact.artifactId + '">';
+						} else {
+							content += '<div class="tab-pane fade" id="content' + item.artifact.artifactId + '" role="tabpanel" aria-labelledby="tab' + item.artifact.artifactId + '">';
+						}
+						content += createInfoBox(item);
+						content += createTable('table' + item.artifact.artifactId, item.detail);
+						content += '</div>';							
+					});
+					navitem += '</ul>';
+					content += '</div>';
+					var html = '';
+					html += navitem;
+					// 公共区域, 可用于显示公共信息, 备用
+					// html += '<div class="tab-custom-content">';
+					// html += '  <p class="lead mb-0">Custom Content goes here</p>';
+					// html += '</div>';
+					html += content;
+					$("#detailCardBody").html(html);
+					if(activeTab != -1) {
+						$('#tab' + activeTab).tab('show');
+					}
+			    },
+			    dataType: "json"
+			});
 		}
 	
 		$(document).ready(function() {
 			var masterId = sessionStorage.getItem("artifactId");
 			if(masterId != null) {
-				$.ajax({
-					type: "GET",
-					url:  "/artifact/findRecursiveDetail",
-					data: {masterId: masterId},
-					success: function(result) {						
-						var navitem = '<ul class="nav nav-tabs" id="tabDetail" role="tablist">';
-						var content = '<div class="tab-content" id="tabContent">';
-						$.each(result, function(i, item) {					
-							navitem += '<li class="nav-item">';
-							if(i == 0) {
-								navitem += '  <a class="nav-link active" id="tab' + item.artifact.artifactId + '" data-toggle="pill" href="#content' + item.artifact.artifactId + '" role="tab" aria-controls="content' + item.artifact.artifactId + '" aria-selected="true">' + item.artifact.artifactName + '</a>';
-							} else {
-								navitem += '  <a class="nav-link" id="tab' + item.artifact.artifactId + '" data-toggle="pill" href="#content' + item.artifact.artifactId + '" role="tab" aria-controls="content' + item.artifact.artifactId + '" aria-selected="false">' + item.artifact.artifactName + '</a>';
-							}							
-							navitem += '</li>';
-							if(i == 0) {
-								content += '<div class="tab-pane fade show active" id="content' + item.artifact.artifactId + '" role="tabpanel" aria-labelledby="tab' + item.artifact.artifactId + '">';
-							} else {
-								content += '<div class="tab-pane fade" id="content' + item.artifact.artifactId + '" role="tabpanel" aria-labelledby="tab' + item.artifact.artifactId + '">';
-							}
-							content += createInfoBox(item);
-							content += createTable('table' + item.artifact.artifactId, item.detail);
-							content += '</div>';							
-						});
-						navitem += '</ul>';
-						content += '</div>';
-						var html = '';
-						html += navitem;
-						// 公共区域, 可用于显示公共信息, 备用
-						// html += '<div class="tab-custom-content">';
-						// html += '  <p class="lead mb-0">Custom Content goes here</p>';
-						// html += '</div>';
-						html += content;
-						$("#detailCardBody").html(html);
-				    },
-				    dataType: "json"
+				// 数据表加载数据
+				loadData(masterId);				
+				// 为导出按钮添加事件
+				$('#btnExportDetail').click(function() {
+					var url = "/export/exportDetail?masterId=" + masterId;
+					Swal.fire({
+						  title: '明细导出到Excel',
+						  text: "导出操作可能会消耗较长时间，确定导出？",
+						  icon: 'question',
+						  showCancelButton: true,
+						  confirmButtonColor: '#3085d6',
+						  confirmButtonText: '确定',
+						  cancelButtonText: '取消'
+						}).then((result) => {
+						  if (result.value) {
+							  window.location.href = url;
+						  }
+						})		            
 				});
 			}
+			// 添加明细时，由用户先输入图号，然后触发查找此零件
+			$("#dlgArtifactCode").change(function() {
+				$("#dlgArtifactName").val("");
+				var code = $(this).val();
+				$.post("/artifact/findArtifactByCode", {artifactCode: code}, function(data) {
+					if(data.artifactName) {
+						$("#dlgArtifactName").val(data.artifactName);
+					} else {
+						myAlert("图号输入有误！");
+					}
+				}, "json");
+			});
+			// 明细保存按钮单击事件, 进行添加或修改明细
+ 			$("#btnSaveDetail").click(function() {
+ 				var parentId = $('a[class="nav-link active"][data-toggle="pill"]').attr("id").substring(3);
+ 				activeTab = parentId;
+ 				var artifactName = $("#dlgArtifactName").val();
+ 				var artifactCode = $("#dlgArtifactCode").val();
+ 				var number =$("#dlgNumber").val();
+ 				var needSplit = $("#dlgNeedSplit").is(":checked") ? true : false;
+ 				var detailMemo = $("#detailMemo").val();
+ 				if(artifactName == "" || artifactCode == "" || number == "") {
+ 					myAlert("明细数据输入不完整！")
+ 					return;
+ 				}
+				$.ajax({
+					type: "POST",
+					url:  saveUrl,
+					data: {parentId: parentId, artifactCode: artifactCode, number: number, needSplit: needSplit, detailMemo: detailMemo},
+					error: function() {
+						myAlert("出错啦！权限不足？");
+					},
+					success: function(result) {	
+						if(result.status == 1) {
+							$("#modal-artifactDetail").modal("hide");
+							loadData(masterId);
+						} else {
+							myAlert(result.message);
+						}
+					},
+					dataType: "json"
+				});
+			}); 
+ 			// 会签保存按钮单击事件
+ 			$("#btnSaveInspect").click(function() {
+ 				var parentId = $('a[class="nav-link active"][data-toggle="pill"]').attr("id").substring(3);
+ 				activeTab = parentId;
+ 				var dimension = $("#dlgDimension").val();
+ 				var unit = $("#dlgUnit").val();
+ 				var quota =$("#dlgQuota").val();
+ 				if(dimension == "" || unit == "" || quota == "") {
+ 					myAlert("会签数据输入不完整！")
+ 					return;
+ 				}
+				$.ajax({
+					type: "POST",
+					url:  "/detail/saveArtifactInspect?id=" + inspectDetailId,
+					data: $("#frmInspect").serialize(),
+					error: function() {
+						myAlert("出错啦！权限不足？");
+					},
+					success: function(result) {	
+						if(result.status == 1) {
+							$("#modal-inspect").modal("hide");
+							loadData(masterId);
+						} else {
+							myAlert(result.message);
+						}
+					},
+					dataType: "json"
+				});
+			}); 
 		    
 		});
 	</script>	

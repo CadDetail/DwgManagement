@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name="sysrole")
 public class SysRole implements Serializable {
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "roleId")
 	private Long roleId;
 	// 角色名称，用于在代码中处理

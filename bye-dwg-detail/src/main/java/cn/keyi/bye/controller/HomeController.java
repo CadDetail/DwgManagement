@@ -64,16 +64,19 @@ public class HomeController {
     }
 	
 	@RequestMapping("/artifact")
+	@RequiresPermissions("artifact:view")
     public String artifact() {
         return "artifact";
     }
 	
 	@RequestMapping("/detail")
+	@RequiresPermissions("detail:view")
     public String detail() {
         return "detail";
     }
 	
 	@RequestMapping("/importdetail")
+	@RequiresPermissions("detail:import")
     public String importdetail() {
         return "importdetail";
     }

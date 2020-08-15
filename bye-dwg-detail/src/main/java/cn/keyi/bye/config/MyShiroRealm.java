@@ -35,7 +35,7 @@ public class MyShiroRealm extends AuthorizingRealm {
             for(SysPermission p:role.getPermissions()) {
                 authorizationInfo.addStringPermission(p.getPermissionCode());
             }
-        }
+        }       
         return authorizationInfo;
 	}
 

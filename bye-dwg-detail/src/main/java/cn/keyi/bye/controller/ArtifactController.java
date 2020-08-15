@@ -1,13 +1,14 @@
 package cn.keyi.bye.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +41,7 @@ public class ArtifactController {
 	 * @return
 	 */
 	@RequestMapping("/findArtifacts")
+	@RequiresPermissions("artifact:view")
 	public Object findArtifacts(HttpServletRequest request) {
 		int draw = Integer.parseInt(request.getParameter("draw"));			// DataTable 要求要返回的参数
 		int pageNumber = Integer.parseInt(request.getParameter("start"));	// 记录起始编号
@@ -47,11 +49,13 @@ public class ArtifactController {
 		pageNumber = pageSize <= 0 ? 1 : pageNumber / pageSize;				// 计算页码
 		String artifactName = request.getParameter("artifactName");			// 工件名称
 		short productFlag = (short) Integer.parseInt(request.getParameter("productFlag"));	// 工件类别
+		Integer canSplit = Integer.parseInt(request.getParameter("canBeSplit"));			// 是否可分解
+		Boolean canBeSplit = canSplit == 0 ? true : false;
 		String orderColumn = request.getParameter("order[0][column]");		// 排序字段编号
 		String orderDir = request.getParameter("order[0][dir]");			// 排序方式
 		String orderField = request.getParameter("columns["+orderColumn+"][data]");	//排序字段名称，这里要注意与数据库字段一致
 		PageRequest pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.fromString(orderDir), orderField));
-		Page<Artifact> page = artifactService.getArtifactsByPage(artifactName, productFlag, pageable);
+		Page<Artifact> page = artifactService.getArtifactsByPage(artifactName, productFlag, canBeSplit, pageable);
 		// 下面代码为满足DataTable插件要求而进行的组装
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("draw", draw);
@@ -61,16 +65,29 @@ public class ArtifactController {
 		return map;
 	}
 	
-	@RequestMapping("/findDetailById")
-	public Object findDetailById(Long detailId) {
-		ArtifactDetail detail = artifactDetailService.getArtifactDetailById(detailId);
-		if(detail == null) {
+	@RequestMapping("/findArtifactById")
+	public Object findArtifactById(Long artifactId) {
+		Artifact artifact = artifactService.getArtifactById(artifactId);
+		if(artifact == null) {
 			Map<String, Object> map = new HashMap<>();
 			map.put("status", 0);
 			map.put("message", "未找到指定的明细记录！");
 			return map;
 		} else {
-			return detail.getSlave();
+			return artifact;
+		}
+	}
+	
+	@RequestMapping("/findArtifactByCode")
+	public Object findArtifactByCode(String artifactCode) {
+		Artifact artifact = artifactService.getArtifactByCode(artifactCode);
+		if(artifact == null) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("status", 0);
+			map.put("message", "未找到指定零件！");
+			return map;
+		} else {
+			return artifact;
 		}
 	}
 	
@@ -87,6 +104,7 @@ public class ArtifactController {
 	 * @return
 	 */
 	@RequestMapping("/findRecursiveDetail")
+	@RequiresPermissions("detail:view")
 	public List<Map<String, Object>> findRecursiveDetail(Long masterId) {
 		List<Map<String, Object>> listDetail = new ArrayList<Map<String, Object>>();
 		Artifact master = artifactService.getArtifactById(masterId);
@@ -96,4 +114,54 @@ public class ArtifactController {
 		}
 		return listDetail;
 	}
+	
+	@RequestMapping("/saveArtifact")
+	@RequiresPermissions(value={"artifact:add","artifact:edit"},logical=Logical.OR)
+	public Object saveArtifact(HttpServletRequest request) {
+		Artifact artifact = new Artifact();
+		if(request.getParameter("id") != null) {
+			Long id = Long.valueOf(request.getParameter("id"));
+			artifact.setArtifactId(id);
+		}
+		artifact.setArtifactName(request.getParameter("artifactName"));
+		artifact.setArtifactCode(request.getParameter("artifactCode"));
+		artifact.setMaterialName(request.getParameter("materialName"));
+		artifact.setWeight(Float.valueOf(request.getParameter("weight")));
+		String canBeSplit = request.getParameter("canBeSplit");
+		if(canBeSplit != null) {
+			artifact.setCanBeSplit(canBeSplit.equals("on") ? true : false);	
+		} else {
+			artifact.setCanBeSplit(false);
+		}
+		artifact.setProductFlag(Short.valueOf(request.getParameter("productFlag")));
+		artifact.setProductModel(request.getParameter("productModel"));
+		artifact.setArtifactMemo(request.getParameter("artifactMemo"));
+		Map<String, Object> map = new HashMap<>();
+		String rslt = artifactService.saveArtifact(artifact);
+		if(rslt.isEmpty()) {
+			map.put("status", 1);
+			map.put("message", "零件保存成功！");
+		} else {
+			map.put("status", 0);
+			map.put("message", rslt);
+		}
+		return map;		
+	}
+	
+	@RequestMapping("/deleteArtifact")
+	@RequiresPermissions("artifact:del")
+	public Object deleteArtifact(Long artifactId) {
+		Map<String, Object> map = new HashMap<>();
+		String rslt = artifactService.deleteArtifact(artifactId);
+		if(rslt.isEmpty()) {
+			map.put("status", 1);
+			map.put("message", "零件删除成功！");
+		} else {
+			map.put("status", 0);
+			map.put("message", rslt);
+		}
+		return map;	
+	}
+	
+	
 }

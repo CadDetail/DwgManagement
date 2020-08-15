@@ -1,10 +1,13 @@
 package cn.keyi.bye.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
@@ -12,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cn.keyi.bye.model.SysPermission;
+import cn.keyi.bye.model.SysRole;
 import cn.keyi.bye.model.SysUser;
 import cn.keyi.bye.service.SysUserService;
 
@@ -70,12 +75,21 @@ public class SysUserController {
 		return map;		
 	}
 	
-	@RequestMapping("/removeUser")
-    @RequiresPermissions("user:del")	// 删除用户权限
-    public Object removeUser(String userName) {
-		Map<String, Object> map = new HashMap<>();
-		map.put("status", 1);
-        map.put("message", "删除成功");
-        return map;
+	/**
+	 * comment: 获取登录用户的权限列表
+	 * author : 兴有林栖
+	 * date   : 2020-8-15
+	 * @return
+	 */
+	@RequestMapping("/queryPermissions")
+    public Object queryPermissions() {
+		List<String> permissionList = new ArrayList<String>();
+		SysUser userInfo  = (SysUser) getLoggedUser();
+        for(SysRole role: userInfo.getRoles()) {
+            for(SysPermission p: role.getPermissions()) {
+            	permissionList.add(p.getPermissionCode());
+            }
+        } 
+        return permissionList;
     }
 }

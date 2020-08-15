@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head th:replace="common/head :: common_head(~{::title}, ~{})">
     <title>产品管理</title>
     <!-- DataTables -->
@@ -43,9 +43,9 @@
 					        <form>
 							  <div class="form-row align-items-center">
 							    <div class="col-auto">
-							      <label class="sr-only" for="txtArtifactName">零件名称</label>
+							      <label class="sr-only" for="txtArtifactName">产品名称</label>
 							      <div class="input-group mb-2">
-							      	<input type="text" class="form-control" id="txtArtifactName" placeholder="请输入零件名称...">
+							      	<input type="text" class="form-control" id="txtArtifactName" placeholder="请输入产品名称...">
 							        <div class="input-group-append">
 							          <button class="btn btn-info" type="button" id="btnFindArtifacts"><i class="fas fa-search"></i>&nbsp;查询</button>
 							        </div>        
@@ -56,7 +56,17 @@
 							      <div class="icheck-info">
 							        <input class="form-check-input" type="checkbox" id="chkOnlyProduct">
 							        <label class="form-check-label" for="chkOnlyProduct">
-							          	只显示成品
+							          	不显示零件
+							        </label>							        
+							      </div>
+							      </div>
+							    </div>
+							    <div class="col-auto">
+							      <div class="form-check mb-2">
+							      <div class="icheck-info">
+							        <input class="form-check-input" type="checkbox" id="chkCanSplit">
+							        <label class="form-check-label" for="chkCanSplit">
+							          	可查询明细
 							        </label>							        
 							      </div>
 							      </div>
@@ -66,14 +76,14 @@
 					        
 					    </div>
 					    <div class="float-right row">
-					    	<div class="col"><button class="btn btn-info" type="button" id="btnNewArtifact" onclick="newArtifact()"><i class="fas fa-wrench"></i>&nbsp;添加产品</button></div>
+					    	<div class="col" shiro:hasAnyPermissions="artifact:add"><button class="btn btn-info" type="button" id="btnNewArtifact" onclick="newArtifact()"><i class="fas fa-wrench"></i>&nbsp;添加产品</button></div>
 					    	<div id="divButtons"></div>	
 					    </div>				    
 					  </div>
 		            </div>
 		            <!-- /.card-header -->            
 		            <div class="card-body">		              
-		              <table id="tableArtifacts" class="table table-bordered table-hover table-striped no-footer">
+		              <table id="tableArtifacts" class="table table-hover table-striped row-border">
 						<thead>
 				            <tr>
 				                <th>Id</th>
@@ -109,46 +119,52 @@
 		              </button>
 		            </div>		          
 			        <!-- form start -->
-		            <form class="form-horizontal">
+		            <form class="form-horizontal" id="frmArtifact">
 		                <div class="card-body">
 		                  <div class="form-group row">
 		                    <label for="dlgArtifactName" class="col-sm-2 col-form-label">名称：</label>
 		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgArtifactName" placeholder="名称">
+		                      <input type="text" class="form-control is-warning" id="dlgArtifactName" name="artifactName" placeholder="名称">
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
 		                    <label for="dlgArtifactCode" class="col-sm-2 col-form-label">图号：</label>
 		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgArtifactCode" placeholder="图号">
+		                      <input type="text" class="form-control is-warning" id="dlgArtifactCode" name="artifactCode" placeholder="图号">
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
 		                    <label for="dlgArtifactWeight" class="col-sm-2 col-form-label">重量：</label>
 		                    <div class="col-sm-10">
-		                      <input type="number" class="form-control" id="dlgArtifactWeight" placeholder="重量">
+		                      <input type="number" class="form-control is-warning" id="dlgArtifactWeight" name="weight" placeholder="重量">
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
 		                    <label for="dlgArtifactMaterial" class="col-sm-2 col-form-label">材料：</label>
 		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgArtifactMaterial" placeholder="材料">
+		                      <input type="text" class="form-control" id="dlgArtifactMaterial" name="materialName" placeholder="材料">
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
 		                    <label for="dlgArtifactFlag" class="col-sm-2 col-form-label">类型：</label>
 		                    <div class="col-sm-10">		                      
-		                      <select class="form-control" id="dlgArtifactFlag">
+		                      <select class="form-control" id="dlgArtifactFlag" name="productFlag">
 		                          <option value ="0">产品</option>
 		                          <option value ="1">零件</option>
 		                      </select>
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgProductModel" class="col-sm-2 col-form-label">型号：</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control" id="dlgProductModel" name="productModel" placeholder="产品型号">
 		                    </div>
 		                  </div>	                  
 		                  <div class="form-group row">
 		                  	<label for="" class="col-sm-2 col-form-label">分解：</label>
 		                    <div class="col-sm-10">
 		                      <div class="icheck-info">
-		                        <input type="checkbox" class="form-check-input" id="dlgCanSplit">
+		                        <input type="checkbox" class="form-check-input" id="dlgCanSplit" name="canBeSplit">
 		                        <label class="form-check-label" for="dlgCanSplit">可拆分为更多子零件</label>
 		                      </div>
 		                    </div>
@@ -156,13 +172,13 @@
 		                  <div class="form-group row">
 		                    <label for="dlgArtifactMemo" class="col-sm-2 col-form-label">备注：</label>
 		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgArtifactMemo" placeholder="备注">
+		                      <input type="text" class="form-control" id="dlgArtifactMemo" name="artifactMemo" placeholder="备注">
 		                    </div>
 		                  </div>
 		                </div>
 		                <!-- /.card-body -->
 		                <div class="card-footer">
-		                  <button type="button" class="btn btn-info">保存</button>
+		                  <button type="button" class="btn btn-info" id="btnSaveArtifact">保存</button>
 		                  <button type="button" class="btn btn-default float-right" data-dismiss="modal">取消</button>
 		                </div>
 		                <!-- /.card-footer -->
@@ -182,6 +198,8 @@
 	<div th:replace="common/footer :: common_js"></div>
 	
 	<script type="text/javascript">	
+		var saveUrl = "";
+		
 		$(document).ready(function() {				
 			// 对数据表格进行初始化
 			var datatable = $('#tableArtifacts').DataTable({
@@ -201,6 +219,7 @@
 		        	data: function(param) {
 		        		param.artifactName = $("#txtArtifactName").val();
 		        		param.productFlag = $("#chkOnlyProduct").is(":checked") ? 0 : -1;
+		        		param.canBeSplit = $("#chkCanSplit").is(":checked") ? 0 : -1;
 		        	}
 		        },
 				columns: [
@@ -213,10 +232,17 @@
 		            { data: 'artifactMemo', orderable: false},
 		            { data: null, orderable: false, "render": function(data, type, row, meta) {
 		            	var htmlOpt = "<div class=\"row\">";
-		            	htmlOpt += "<button type='button' class='btn btn-info btn-sm'   onclick='editArtifact("   + JSON.stringify(row) + ")'><i class='fas fa-pencil-alt'></i>&nbsp;编辑</button>&nbsp;";
-		            	htmlOpt += "<button type='button' class='btn btn-danger btn-sm' onclick='deleteArtifact(" + JSON.stringify(row) + ")'><i class='fas fa-trash     '></i>&nbsp;删除</button>&nbsp;";
-		            	if(row.canBeSplit) {
-		            		htmlOpt += "<button type='button' class='btn btn-success btn-sm' onclick=\"viewDetail('" + row.artifactId + "')\"><i class='fas fa-eye'></i>&nbsp;明细</button>&nbsp;";
+		            	var permissions = sessionStorage.getItem("permissions");
+		            	if(permissions.indexOf("artifact:edit") != -1) {
+		            		htmlOpt += "<button type='button' class='btn btn-info btn-sm'   onclick='editArtifact("   + JSON.stringify(row) + ")'><i class='fas fa-pencil-alt'></i>&nbsp;编辑</button>&nbsp;";
+		            	}
+		            	if(permissions.indexOf("artifact:del") != -1) {
+		            		htmlOpt += "<button type='button' class='btn btn-danger btn-sm' onclick='deleteArtifact(" + row.artifactId + ")'><i class='fas fa-trash'></i>&nbsp;删除</button>&nbsp;";
+		            	}
+		            	if(permissions.indexOf("detail:view") != -1) {
+			            	if(row.canBeSplit) {
+			            		htmlOpt += "<button type='button' class='btn btn-success btn-sm' onclick=\"viewDetail('" + row.artifactId + "')\"><i class='fas fa-eye'></i>&nbsp;明细</button>&nbsp;";
+			            	}
 		            	}
 		            	htmlOpt += "</div>";
 		            	return htmlOpt;
@@ -231,11 +257,17 @@
 			    	{
 			            extend: 'excel',
 			            text: '导出到Excel',
-			            className: 'btn btn-success'
+			            className: 'btn btn-success',
+			            exportOptions: {
+			            	columns: [ 0, 2, 3, 4, 5, 6 ] 
+			            }
 			        },
 			        {
 			            extend: 'print',
-			            text: '打印'
+			            text: '打印',
+			            exportOptions: {
+			            	columns: [ 0, 2, 3, 4, 5, 6 ] 
+			            }
 			        }
 		        ]
 			} );
@@ -252,17 +284,56 @@
 			  });
 			
 			// 查询按钮、复选框事件
-			$("#btnFindArtifacts, #chkOnlyProduct").click(function() {
+			$("#btnFindArtifacts, #chkOnlyProduct, #chkCanSplit").click(function() {
 				var flag = $("#chkOnlyProduct").is(":checked") ? 0 : -1;
+				var flag2 = $("#chkCanSplit").is(":checked") ? 0 : -1;
 				var param = {
 					artifactName: $("#txtArtifactName").val(),
-					productFlag: flag
+					productFlag: flag,
+					canBeSplit: flag2
 				}
 				// 重新加载查询参数并执行查询
 				datatable.settings()[0].ajax.data = param;
 				//datatable.ajax.reload();
 				datatable.draw();
 			});	
+			
+			// 保存按钮单击事件
+ 			$("#btnSaveArtifact").click(function() {
+ 				var artifactName = $("#dlgArtifactName").val();
+ 				var artifactCode = $("#dlgArtifactCode").val();
+ 				var weight =$("#dlgArtifactWeight").val();
+ 				if(artifactName == "" || artifactCode == "" || weight == "") {
+ 					myAlert("零件信息输入不完整！")
+ 					return;
+ 				}
+				$.ajax({
+					type: "POST",
+					url:  saveUrl,
+					data: $("#frmArtifact").serialize(),
+					error: function() {
+						myAlert("出错啦！权限不足？");
+					},
+					success: function(result) {
+						if(result.status == 1) {
+							$("#modal-artifact").modal("hide");
+							var title = $("#dlgArtifactTitle").html();
+							if(title == "新增工件") {
+								// 添加时，跳转到最后一页
+								datatable.page("last").draw("page");
+							} else {
+								// 重新加载数据, 但是保持原来的分页参数
+								datatable.ajax.reload(null, false);
+							}
+						} else {
+							myAlert(result.message);
+						}
+					},
+					dataType: "json"
+				});
+			}); 
+			
+			
 		});
 		
 		// 明细按钮单击事件
@@ -271,26 +342,31 @@
 			window.location = "/detail";
 		}
 		
+		// 添加一个新产品（零件）
 		function newArtifact() {
+			saveUrl = "/artifact/saveArtifact";
 			$("#modal-artifact input").val("");
 			$("#dlgArtifactTitle").html("新增工件");
 			$("#modal-artifact").modal("show");
 		}
 		
+		// 编辑（修改）产品（零件）
 		function editArtifact(artifact) {
+			saveUrl = "/artifact/saveArtifact?id=" + artifact.artifactId;
 			$("#dlgArtifactName").val(artifact.artifactName);
 			$("#dlgArtifactCode").val(artifact.artifactCode);
 			$("#dlgArtifactWeight").val(artifact.weight);
-			$("#dlgArtifactMaterial").val(artifact.materialName);
+			$("#dlgArtifactMaterial").val(artifact.materialName);			
 			$("#dlgArtifactFlag")[0].selectedIndex = artifact.productFlag;
+			$("#dlgProductModel").val(artifact.productModel);
 			$("#dlgCanSplit").prop("checked", artifact.canBeSplit);
 			$("#dlgArtifactMemo").val(artifact.artifactMemo);
 			$("#dlgArtifactTitle").html("修改工件");
 			$("#modal-artifact").modal("show");
 		}
 		
-		// 具体功能未实现
-		function deleteArtifact(artifact) {
+		// 删除产品（零件）
+		function deleteArtifact(artifactId) {
 			Swal.fire({
 				  title: '确定吗？',
 				  text: "一旦删除，数据将不可恢复！",
@@ -302,13 +378,17 @@
 				  cancelButtonText: '取消'
 				}).then((result) => {
 				  if (result.value) {
-				    Swal.fire(
-				      'Deleted!',
-				      'Your file has been deleted.',
-				      'success'
-				    )
+					  $.post("/artifact/deleteArtifact", {artifactId: artifactId}, function(data){
+						  if(data.status == 1) {
+							// 重新加载数据, 但是保持原来的分页参数
+							var datatable = $('#tableArtifacts').DataTable();
+							datatable.ajax.reload(null, false);
+						  } else {							  
+							  Swal.fire('失败！', data.message, 'error');
+						  }
+					  });
 				  }
-				})
+				});
 		}
 	</script>	
 </body>
