@@ -104,13 +104,23 @@ public class ArtifactService {
 		String rslt = "";
 		try {
 			artifactDao.deleteById(artifactId);
-		} catch (Exception e2) {		
-			rslt = e2.getMessage();
+		} catch (Exception e) {		
+			rslt = e.getMessage();
 			if(rslt.contains("ConstraintViolationException")) {
 				rslt = "违反参照完整性，请先删除其在明细中的记录！";
 			}
 		}
 		return rslt;
+	}
+	
+	// 获得数据库中产品和零件的数量
+	public Long getArtifactCount() {
+		return artifactDao.count();
+	}
+	
+	// 根据产品标识获取产品或零件的数量
+	public Long getArtifactCount(Short productFlag) {
+		return artifactDao.countByProductFlag(productFlag);
 	}
 	
 }

@@ -34,6 +34,7 @@
 		<script type="text/javascript" src="/plugins/datatables/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
 		<!-- switch bootstrap -->
 		<script type="text/javascript" src="/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+		<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
 		<!-- 页面初始化工作 -->
 		<script type="text/javascript">
 			$(document).ready(function() {				
@@ -62,6 +63,7 @@
 					    dataType: "json"
 					});
 			    }
+				
 				$("#username").html(loggedUser.userName);
 				$("#useralias").html(loggedUser.userAlias);
 				var rolelist = new Array();
@@ -79,6 +81,9 @@
 						$("#imgUserPhoto").attr("src", "/img/user8-128x128.jpg");
 						$("#imgUserProfile").attr("src", "/img/user8-128x128.jpg");
 					}
+				} else {
+					$("#imgUserPhoto").attr("src", "/img/user8-128x128.jpg");
+					$("#imgUserProfile").attr("src", "/img/user8-128x128.jpg");
 				}
 				
 				// 激活对应的导航菜单

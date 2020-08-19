@@ -1,7 +1,14 @@
 package cn.keyi.bye.service;
 
+import java.util.Optional;
+
+import org.apache.shiro.crypto.hash.SimpleHash;
+import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import cn.keyi.bye.dao.SysUserDao;
 import cn.keyi.bye.model.SysUser;
 
@@ -17,8 +24,21 @@ public class SysUserService {
 	 * @return
 	 */
 	public SysUser findByUserName(String userName) {
-		System.out.println("SysUserService.findByUserName()");
 		return sysUserDao.findByUserName(userName);
+	}
+	
+	/**
+	 * 根据ID查询用户信息
+	 * @param userId
+	 * @return
+	 */
+	public SysUser findByUserId(Long userId) {		
+		Optional<SysUser> findResult = sysUserDao.findById(userId);
+		if(findResult.isPresent()) {
+			return findResult.get();
+		} else {
+			return null;
+		}
 	}
 	
 	/**
@@ -27,7 +47,6 @@ public class SysUserService {
 	 * @return
 	 */
 	public String saveUser(SysUser user) {
-		System.out.println("SysUserService.saveUser()");
 		String rslt = "";
 		try {
 			sysUserDao.save(user);
@@ -35,5 +54,53 @@ public class SysUserService {
 			rslt = e.getMessage();
 		}
 		return rslt;
+	}
+	
+	/**
+	 * 根据用户姓名模糊查询对应的用户列表
+	 * @param userAlias
+	 * @param pageable
+	 * @return
+	 */
+	public Page<SysUser> getUsersByPage(String userAlias, Pageable pageable) {
+		return sysUserDao.findByUserAliasContaining(userAlias, pageable);
+	}
+	
+	/**
+	 * 根据ID删除用户
+	 * @param userId
+	 * @return
+	 */
+	public String deleteUser(Long userId) {
+		String rslt = "";
+		try {
+			sysUserDao.deleteById(userId);
+		} catch (Exception e) {		
+			rslt = e.getMessage();
+			if(rslt.contains("ConstraintViolationException")) {
+				rslt = "违反参照完整性，请先删除其在明细中的记录！";
+			}
+		}
+		return rslt;
+	}
+	
+	/**
+	 * 根据salt对明文密码进行加密
+	 * @param originalPassword
+	 * @param salt
+	 * @param hashIterations
+	 * @return
+	 */
+	public String generatePassword(String originalPassword, String salt, int hashIterations) {
+		SimpleHash passwordHash = new SimpleHash("md5", originalPassword, ByteSource.Util.bytes(salt), hashIterations);
+		return passwordHash.toHex();
+	}
+	
+	/**
+	 * 用户数量
+	 * @return
+	 */
+	public Long getUserCount() {
+		return sysUserDao.count();
 	}
 }

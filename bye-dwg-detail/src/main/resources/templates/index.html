@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
-<head th:replace="common/head :: common_head(~{::title}, ~{})">
+<head th:replace="common/head :: common_head(~{::title}, ~{::link})">
     <title>主页</title>
+    <!-- Tempusdominus Bbootstrap 4 -->
+  	<link rel="stylesheet" href="plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
     <!-- Site wrapper -->
@@ -42,14 +44,13 @@
                             <!-- small box -->
                             <div class="small-box bg-info">
                                 <div class="inner">
-                                    <h3>150</h3>
-
-                                    <p>New Orders</p>
+                                    <h3 id="lblCntUser">150</h3>
+                                    <p>注册用户</p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-bag"></i>
+                                    <i class="ion ion-person-stalker"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="/user" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
                         <!-- ./col -->
@@ -57,14 +58,13 @@
                             <!-- small box -->
                             <div class="small-box bg-success">
                                 <div class="inner">
-                                    <h3>53<sup style="font-size: 20px">%</sup></h3>
-
-                                    <p>Bounce Rate</p>
+                                    <h3 id="lblCntRole">53</h3>
+                                    <p>配备角色</p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-stats-bars"></i>
+                                    <i class="ion ion-ios-glasses"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="/role" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
                         <!-- ./col -->
@@ -72,14 +72,13 @@
                             <!-- small box -->
                             <div class="small-box bg-warning">
                                 <div class="inner">
-                                    <h3>44</h3>
-
-                                    <p>User Registrations</p>
+                                    <h3 id="lblCntPermission">44</h3>
+                                    <p>操作权限</p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-person-add"></i>
+                                    <i class="ion ion-key"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="/permission" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
                         <!-- ./col -->
@@ -87,45 +86,101 @@
                             <!-- small box -->
                             <div class="small-box bg-danger">
                                 <div class="inner">
-                                    <h3>65</h3>
-
-                                    <p>Unique Visitors</p>
+                                    <h3 id="lblCntArtifact">65</h3>
+                                    <p>工件数量</p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-pie-graph"></i>
+                                    <i class="ion ion-briefcase"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="/artifact" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
                         <!-- ./col -->
                     </div>
                     <!-- /.row -->
                     
-                    <!-- Main row -->
+                    <!-- row -->
                     <div class="row">
-                    	<section class="col-lg-12 connectedSortable">
-                    		<!-- AREA CHART -->
-				            <div class="card card-info">
-				              <div class="card-header">
-				                <h3 class="card-title">Area Chart</h3>
-				
-				                <div class="card-tools">
-				                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
-				                  </button>
-				                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-				                </div>
-				              </div>
-				              <div class="card-body">
-				                <div class="chart">
-				                  <canvas id="areaChart" style="height:500px; min-height:300px"></canvas>
-				                </div>
-				              </div>
-				              <!-- /.card-body -->
-				            </div>
-				            <!-- /.card -->
-                    	</section>                    	
+                      <div class="col-12">
+		                <!-- Calendar -->
+			            <div class="card card-outline card-info">
+			              <div class="card-header border-0">			
+			                <h3 class="card-title">
+			                  <i class="far fa-calendar-alt mr-1"></i>Calendar
+			                </h3>
+			                <!-- tools card -->
+			                <div class="card-tools">
+			                  <button type="button" class="btn btn-success btn-sm" data-card-widget="collapse">
+			                    <i class="fas fa-minus"></i>
+			                  </button>
+			                </div>
+			                <!-- /. tools -->
+			              </div>
+			              <!-- /.card-header -->
+			              <div class="card-body pt-0">
+			                <!--The calendar -->
+			                <div id="calendar" style="width: 100%"></div>
+			              </div>
+			              <!-- /.card-body -->
+			            </div>
+			            <!-- /.card -->                    
+                      </div>
                     </div>
                     <!-- /.row -->
+                    
+                    <!-- row -->
+                    <div class="row">
+          			  <div class="col-12">          			  
+          			  	<!-- Main content -->
+			            <div class="invoice p-3 mb-3">
+			              <!-- title row -->
+			              <div class="row">
+			                <div class="col-12">
+			                  <h4>
+			                    <i class="fas fa-globe"></i> Zhejiang Baiyun Zhebian Electric Equipment Co., Ltd.
+			                    <small class="float-right text-muted">Founding Date: 04/11/2009</small>
+			                  </h4>
+			                </div>
+			                <!-- /.col -->
+			              </div>
+			              <!-- info row -->
+			              <div class="row invoice-info mt-2">
+			                <div class="col-sm-4 invoice-col">
+			                  <address>
+			                    <strong>浙江白云浙变电气设备有限公司</strong><br>
+			                   	 浙江省<br>
+			                                                   杭州湾上虞经济技术开发区<br>
+			                    Phone: (86) 0575-89286982<br>
+			                    Email: info@wolong.com
+			                  </address>
+			                </div>
+			                <!-- /.col -->
+			                <div class="col-sm-4 invoice-col">
+			                  <address>
+			                    <strong></strong><br>
+								Registered Capital: 35000万元人民币<br>
+								Industry: 电气机械和器材制造业<br>			                                                  
+								Type: 有限责任公司<br>
+								Staff Members: 200-299人
+			                  </address>
+			                </div>
+			                <!-- /.col -->
+			                <div class="col-sm-4 invoice-col">
+			                  <strong></strong><br>
+			                  <br>
+						                  组织机构代码: 69704669-X<br>
+						                  统一社会信用代码: 9133060469704669XE<br>
+						                  官网: http://byzjbyq.com
+			                </div>
+			                <!-- /.col -->
+			              </div>
+			              <!-- /.row -->
+			            </div>
+			            <!-- /.Main content -->
+          			  
+          			  </div>
+          			</div>
+          			<!-- /.row -->
                 
                 </div>
             </section>
@@ -139,69 +194,34 @@
     <!-- ./wrapper -->    
 
 	<div th:replace="common/footer :: common_js"></div>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script type="text/javascript" src="/plugins/moment/moment-with-locales.min.js"></script>
+	<script type="text/javascript" src="/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 	<script type="text/javascript">	
 		$(document).ready(function() {
 			
 			// 取消活动菜单的反亮显示
 			$(".sidebar .nav-link").removeClass("active");
 			
-		    // Get context with jQuery - using jQuery's .get() method.
-		    var areaChartCanvas = $('#areaChart').get(0).getContext('2d')
-
-		    var areaChartData = {
-		      labels  : ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-		      datasets: [
-		        {
-		          label               : 'Digital Goods',
-		          backgroundColor     : 'rgba(60,141,188,0.9)',
-		          borderColor         : 'rgba(60,141,188,0.8)',
-		          pointRadius          : false,
-		          pointColor          : '#3b8bba',
-		          pointStrokeColor    : 'rgba(60,141,188,1)',
-		          pointHighlightFill  : '#fff',
-		          pointHighlightStroke: 'rgba(60,141,188,1)',
-		          data                : [28, 48, 40, 19, 86, 27, 90]
-		        },
-		        {
-		          label               : 'Electronics',
-		          backgroundColor     : 'rgba(210, 214, 222, 1)',
-		          borderColor         : 'rgba(210, 214, 222, 1)',
-		          pointRadius         : false,
-		          pointColor          : 'rgba(210, 214, 222, 1)',
-		          pointStrokeColor    : '#c1c7d1',
-		          pointHighlightFill  : '#fff',
-		          pointHighlightStroke: 'rgba(220,220,220,1)',
-		          data                : [65, 59, 80, 81, 56, 55, 40]
-		        },
-		      ]
-		    }
-
-		    var areaChartOptions = {
-		      maintainAspectRatio : false,
-		      responsive : true,
-		      legend: {
-		        display: false
-		      },
-		      scales: {
-		        xAxes: [{
-		          gridLines : {
-		            display : false,
-		          }
-		        }],
-		        yAxes: [{
-		          gridLines : {
-		            display : false,
-		          }
-		        }]
-		      }
-		    }
-
-		    // This will get the first returned node in the jQuery collection.
-		    var areaChart       = new Chart(areaChartCanvas, { 
-		      type: 'line',
-		      data: areaChartData, 
-		      options: areaChartOptions
-		    })
+			  // The Calender
+			  $('#calendar').datetimepicker({
+			    format: 'L',
+			    locale: 'zh-cn',
+			    inline: true,
+			    calendarWeeks: true
+			  })
+						
+			$.ajax({
+				type: "GET",
+				url:  "/getCountInfo",
+				success: function(result) {	
+					$("#lblCntUser").html(result.user);
+					$("#lblCntRole").html(result.role);
+					$("#lblCntPermission").html(result.permission);
+					$("#lblCntArtifact").html(result.artifact);
+				},
+			    dataType: "json"
+			});	
    
 		});
 	</script>	

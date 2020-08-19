@@ -218,25 +218,25 @@
 			var html = '';
 			html += '<div class="row" style="margin-top:10px;">';
 			html += '  <div class="col-md-3 col-sm-6 col-12">';
-			html += '    <div class="info-box">';
+			html += '    <div class="info-box h-100">';
 			html += '      <span class="info-box-icon bg-info"><i class="far fa-bookmark"></i></span>';
-			html += '      <div class="info-box-content">';
+			html += '      <div class="info-box-content text-truncate">';
 			html += '        <span class="info-box-text">图号</span>';
 			html += '        <span class="info-box-number">' + data.artifact.artifactCode + '</span>';
 			html += '      </div>';
 			html += '    </div>';
 			html += '  </div>';
 			html += '  <div class="col-md-3 col-sm-6 col-12">';
-			html += '    <div class="info-box">';
+			html += '    <div class="info-box h-100">';
 			html += '      <span class="info-box-icon bg-success"><i class="ion ion-ios-gear-outline"></i></span>';
-			html += '      <div class="info-box-content">';
+			html += '      <div class="info-box-content text-truncate">';
 			html += '        <span class="info-box-text">名称</span>';
 			html += '        <span class="info-box-number">' + data.artifact.artifactName + '</span>';
 			html += '      </div>';
 			html += '    </div>';
 			html += '  </div>';
 			html += '  <div class="col-md-3 col-sm-6 col-12">';
-			html += '    <div class="info-box">';
+			html += '    <div class="info-box h-100">';
 			html += '      <span class="info-box-icon bg-warning"><i class="far fa-hourglass"></i></span>';
 			html += '      <div class="info-box-content">';
 			html += '        <span class="info-box-text">重量</span>';
@@ -247,10 +247,10 @@
 			html += '    </div>';
 			html += '  </div>';
 			html += '  <div class="col-md-3 col-sm-6 col-12">';
-			html += '    <div class="info-box">';
+			html += '    <div class="info-box h-100">';
 			html += '      <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>';
 			html += '      <div class="info-box-content">';
-			html += '        <span class="info-box-text">其零件数量需乘倍数</span>';
+			html += '        <span class="info-box-text">倍乘</span>';
 			html += '        <span class="info-box-number">' + data.times + '</span>';
 			html += '      </div>';
 			html += '    </div>';
@@ -263,7 +263,7 @@
 		function createTable(tableId, data) {
 			var permissions = sessionStorage.getItem("permissions");
 			var html = '<div class="table-responsive">';
-			html += '<table class="table table-hover table-striped" id="' + tableId + '">';
+			html += '<table class="table table-hover table-striped projects" id="' + tableId + '">';
 			html += '<thead>';
 			html += '    <tr>';
 			html += '      <th scope="col">#</th>';
@@ -273,7 +273,7 @@
 			html += '      <th scope="col">数量</th>';
 			html += '      <th scope="col">材料</th>';
 			html += '      <th scope="col">需分解</th>';
-			html += '      <th scope="col">操作</th>';
+			html += '      <th scope="col"></th>';
 			html += '    </tr>';
 			html += '</thead>';
 			html += '<tbody>';
@@ -298,15 +298,15 @@
 				} else {
 					html += '<td>' + item.needSplit + '</td>';
 				}
-				html += '<td>';				
+				html += '<td class="project-actions text-right">';				
             	if(permissions.indexOf("detail:edit") != -1) {
-					html += "<button type='button' class='btn btn-info btn-sm' onclick='editDetail(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt'></i>&nbsp;编辑</button>&nbsp;";
+					html += "<button type='button' class='btn btn-info btn-sm ml-2' onclick='editDetail(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt mr-1'></i>编辑</button>";
             	}
             	if(permissions.indexOf("detail:del") != -1) {
-					html += '<button type="button" class="btn btn-danger btn-sm" onclick="deleteDetail(' + item.detailId + ')"><i class="fas fa-trash"></i>&nbsp;删除</button>&nbsp;';
+					html += '<button type="button" class="btn btn-danger btn-sm ml-2" onclick="deleteDetail(' + item.detailId + ')"><i class="fas fa-trash mr-1"></i>删除</button>';
             	}
             	if(permissions.indexOf("detail:check") != -1) {
-					html += "<button type='button' class='btn btn-success btn-sm' onclick='doInspect(" + JSON.stringify(item) + ")'><i class='fas fa-paw'></i>&nbsp;会签</button>&nbsp;";
+					html += "<button type='button' class='btn btn-success btn-sm ml-2' onclick='doInspect(" + JSON.stringify(item) + ")'><i class='fas fa-paw mr-1'></i>会签</button>";
             	}
             	html += '</td>';
 				html += '</tr>';

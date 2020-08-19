@@ -85,6 +85,7 @@ public class ExportController {
 			// 具体明细
 			Artifact artifact = (Artifact) listDetail.get(i).get("artifact");
 			Integer numberMulti = (Integer) listDetail.get(i).get("times");
+			@SuppressWarnings("unchecked")
 			List<ArtifactDetail> details = (List<ArtifactDetail>) listDetail.get(i).get("detail");
 			// 零件名称
 			cell = sheet.getRow(34).getCell(10);

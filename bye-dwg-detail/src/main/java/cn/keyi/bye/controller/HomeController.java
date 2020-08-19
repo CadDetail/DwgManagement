@@ -1,5 +1,8 @@
 package cn.keyi.bye.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -7,6 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import cn.keyi.bye.service.ArtifactService;
+import cn.keyi.bye.service.SysPermissionService;
+import cn.keyi.bye.service.SysRoleService;
 import cn.keyi.bye.service.SysUserService;
 
 /**
@@ -18,14 +26,21 @@ import cn.keyi.bye.service.SysUserService;
 public class HomeController {
 
 	@Autowired
-	SysUserService sysUserService;	
+	SysUserService sysUserService;
+	@Autowired
+	SysRoleService sysRoleService;
+	@Autowired
+	SysPermissionService sysPermissionService;
+	@Autowired
+	ArtifactService artifactService;
+	
 	
 	@RequestMapping("/login")
 	public String doLogin(HttpServletRequest request, Model model) {
 		// 若登录失败，则从 request 中获取 shiro 处理的异常信息，shiroLoginFailure 为  shiro 异常类的全类名   
         String error = "";
         String exception = (String) request.getAttribute("shiroLoginFailure");
-        System.out.println(exception);
+        // System.out.println(exception);
         if(exception != null) {
         	if(exception.contains("UnknownAccountException")) {
         		error = "账号不存在";
@@ -80,4 +95,17 @@ public class HomeController {
     public String importdetail() {
         return "importdetail";
     }
+	
+	@RequestMapping("/getCountInfo")
+	@ResponseBody
+	public Object getCountInfo() {
+		Map<String, Object> map = new HashMap<>();
+		map.put("user", sysUserService.getUserCount());
+		map.put("role", sysRoleService.getRoleCount());
+		map.put("permission", sysPermissionService.getPermissionCount());
+		map.put("product", artifactService.getArtifactCount((short) 0));
+		map.put("artifact", artifactService.getArtifactCount());
+		return map;
+	}
+	
 }

@@ -93,7 +93,7 @@
 				                <th>重量</th>
 				                <th>材料</th>
 				                <th>备注</th>
-				                <th>操作</th>
+				                <th></th>
 				            </tr>
 				        </thead>
 		              </table>
@@ -231,18 +231,18 @@
 		            { data: 'materialName', orderable: false},
 		            { data: 'artifactMemo', orderable: false},
 		            { data: null, orderable: false, "render": function(data, type, row, meta) {
-		            	var htmlOpt = "<div class=\"row\">";
+		            	var htmlOpt = "<div class='d-flex justify-content-end'>";
 		            	var permissions = sessionStorage.getItem("permissions");
-		            	if(permissions.indexOf("artifact:edit") != -1) {
-		            		htmlOpt += "<button type='button' class='btn btn-info btn-sm'   onclick='editArtifact("   + JSON.stringify(row) + ")'><i class='fas fa-pencil-alt'></i>&nbsp;编辑</button>&nbsp;";
-		            	}
-		            	if(permissions.indexOf("artifact:del") != -1) {
-		            		htmlOpt += "<button type='button' class='btn btn-danger btn-sm' onclick='deleteArtifact(" + row.artifactId + ")'><i class='fas fa-trash'></i>&nbsp;删除</button>&nbsp;";
-		            	}
 		            	if(permissions.indexOf("detail:view") != -1) {
 			            	if(row.canBeSplit) {
-			            		htmlOpt += "<button type='button' class='btn btn-success btn-sm' onclick=\"viewDetail('" + row.artifactId + "')\"><i class='fas fa-eye'></i>&nbsp;明细</button>&nbsp;";
+			            		htmlOpt += "<button type='button' class='btn btn-success btn-sm ml-2' onclick=\"viewDetail('" + row.artifactId + "')\"><i class='fas fa-eye mr-1'></i>明细</button>";
 			            	}
+		            	}
+		            	if(permissions.indexOf("artifact:edit") != -1) {
+		            		htmlOpt += "<button type='button' class='btn btn-info btn-sm ml-2' onclick='editArtifact("   + JSON.stringify(row) + ")'><i class='fas fa-pencil-alt mr-1'></i>编辑</button>";
+		            	}
+		            	if(permissions.indexOf("artifact:del") != -1) {
+		            		htmlOpt += "<button type='button' class='btn btn-danger btn-sm ml-2' onclick='deleteArtifact(" + row.artifactId + ")'><i class='fas fa-trash mr-1'></i>删除</button>";
 		            	}
 		            	htmlOpt += "</div>";
 		            	return htmlOpt;
