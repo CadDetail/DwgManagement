@@ -5,10 +5,13 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.SimpleCookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
@@ -29,7 +32,8 @@ public class ShiroConfig {
 		shiroFilterFactoryBean.setSecurityManager(securityManager);	// 安全管理器		
 		// 过滤链定义，从上向下顺序执行，一般将 /** 放在最为下边（这是一个坑，一不小心代码就不好使了）
 	    // authc: 所有 url 都必须认证通过才可以访问；anon: 所有 url 都可以匿名访问
-		Map<String,String> filterChainDefinitionMap = new LinkedHashMap<String, String>();		
+		Map<String,String> filterChainDefinitionMap = new LinkedHashMap<String, String>();	
+		filterChainDefinitionMap.put("/login", "anon");
 		filterChainDefinitionMap.put("/static/**", "anon");
 		filterChainDefinitionMap.put("/favicon.ico", "anon");
 		filterChainDefinitionMap.put("/css/**", "anon");
@@ -38,7 +42,8 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/plugins/**", "anon");
 		filterChainDefinitionMap.put("/files/**", "anon");
 		filterChainDefinitionMap.put("/logout", "logout");	// 退出过滤器，具体退出代码由 Shiro 自身实现	
-		filterChainDefinitionMap.put("/**", "authc");
+		// filterChainDefinitionMap.put("/**", "authc");
+		filterChainDefinitionMap.put("/**", "user"); // user权限是配置记住我或认证通过可以访问
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);	// 拦截器
 		return shiroFilterFactoryBean;
 	}
@@ -75,7 +80,10 @@ public class ShiroConfig {
 	@Bean
 	public SecurityManager securityManager(){
 		DefaultWebSecurityManager securityManager =  new DefaultWebSecurityManager();
+		// 设置realm
 		securityManager.setRealm(myShiroRealm());
+		// 注入记住我管理器
+	    securityManager.setRememberMeManager(rememberMeManager());		
 		return securityManager;
 	}
 
@@ -112,5 +120,29 @@ public class ShiroConfig {
     public ShiroDialect shiroDialect(){
         return new ShiroDialect();
     }
+	
+	/**
+	 * cookie对象
+	 * @return
+	 */
+	public SimpleCookie rememberMeCookie(){
+	   // 这个参数是cookie的名称，对应前端的 checkbox 的 name = rememberMe
+	   SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
+	   // 记住我cookie生效时间1天，单位秒
+	   simpleCookie.setMaxAge(86400);
+	   return simpleCookie;
+	}
+
+	/**
+	 * cookie管理对象——记住我功能
+	 * @return
+	 */
+	public CookieRememberMeManager rememberMeManager(){
+	   CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
+	   cookieRememberMeManager.setCookie(rememberMeCookie());
+	   //rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度(128 256 512 位)
+	   cookieRememberMeManager.setCipherKey(Base64.decode("3AvVhmFLUs0KTA3Kprsdag=="));
+	   return cookieRememberMeManager;
+	}
 	
 }

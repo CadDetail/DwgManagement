@@ -8,10 +8,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
-  <!-- Ionicons -->
-  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- icheck bootstrap -->
-  <link rel="stylesheet" href="/plugins/icheck-bootstrap/icheck-bootstrap.min.css">  
+  <link rel="stylesheet" href="/plugins/icheck-bootstrap/icheck-bootstrap.min.css"> 
+  <!-- sweetalert 2 -->
+  	<link rel="stylesheet" href="/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css"> 
   <!-- Theme style -->
   <link rel="stylesheet" href="/css/adminlte.min.css">
   <!-- Google Font: Source Sans Pro -->
@@ -41,27 +41,13 @@
         </div>
         <div class="input-group mb-3">
           <div class="icheck-info">
-            <input id="remember" name="remember" type="checkbox">
-            <label for="remember">记住我 </label>
+            <input id="rememberMe" name="rememberMe" type="checkbox">
+            <label for="rememberMe">记住我 </label>
           </div>
         </div>
         <div class="input-group mb-3">
-            <button id="dologin" type="submit" class="btn btn-info btn-block">登录</button>
-            <input type="hidden" id="errorinfo" th:value="${error}">
-        </div>
-        <div class="input-group mb-3">
-        	<div class="card bg-gradient-danger col-12" id="errorcard" hidden>
-              <div class="card-header">
-                <h3 class="card-title" th:text="${error}"></h3>
-                <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i>
-                  </button>
-                </div>
-                <!-- /.card-tools -->
-              </div>
-              <!-- /.card-header -->
-            </div>
-            <!-- /.card -->
+            <button id="dologin" type="button" class="btn btn-info btn-block">登录</button>
+            <!-- <input type="hidden" id="errorinfo" th:value="${error}"> -->
         </div>
       </form>
     </div>
@@ -74,18 +60,49 @@
 <script type="text/javascript" src="/plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
 <script type="text/javascript" src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Sweetalert 2 -->
+<script type="text/javascript" src="/plugins/sweetalert2/sweetalert2.min.js"></script>
 <!-- AdminLTE App -->
 <script type="text/javascript" src="/js/adminlte.min.js"></script>
 <script type="text/javascript">
+	//自定义的弹出对话框
+	function myAlert(info) {
+		Swal.fire({
+			toast: true,
+			position: 'top',
+			padding: '1em',
+			html: '<span style="color:#ffffff"><i class="icon fas fa-exclamation-triangle"></i>&nbsp;&nbsp;' + info + '</span>',
+			showConfirmButton: false,
+			background: '#dc3545',
+			timer: 3000
+		});
+	}
+
 	$(document).ready(function() {		
-		var error = $("#errorinfo").val();
-		//alert(error);
-		if(error == null || error == "") {
-			$('#errorcard').attr("hidden");
-		} else {
-			$('#errorcard').removeAttr("hidden");
-		}
+		
 		sessionStorage.clear();
+		
+		// 提交登录
+		$("#dologin").click(function() {
+			var username = $("#username").val();
+			var password = $("#password").val();
+			var rememberMe = $('#rememberMe').is(':checked');
+			if(username == "" || password == "") {
+				myAlert('账号和密码均不能为空！');
+				return;
+			}
+			$.post("/login", {
+				"username" : username,
+				"password" : password,
+				"rememberMe" : rememberMe
+			}, function(result) {
+				if (result.status == 1) {
+					location.href = "/index";
+				} else {
+					myAlert(result.message);
+				}
+			});
+		});
 	});
 </script>
 </body>
