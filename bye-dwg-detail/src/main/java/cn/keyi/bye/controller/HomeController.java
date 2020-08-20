@@ -3,8 +3,6 @@ package cn.keyi.bye.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.CredentialsException;
@@ -16,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import cn.keyi.bye.service.ArtifactService;
 import cn.keyi.bye.service.SysPermissionService;
 import cn.keyi.bye.service.SysRoleService;
@@ -62,7 +59,7 @@ public class HomeController {
 	
 	@RequestMapping(value="/login", method=RequestMethod.POST)
 	@ResponseBody
-	public Map<String,Object> submitLogin(String username, String password, Boolean rememberMe, Model model) {
+	public Map<String,Object> postLogin(String username, String password, Boolean rememberMe, Model model) {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		String errorMsg = "登录成功！";		
 		try {
@@ -83,7 +80,7 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value="/login", method=RequestMethod.GET) 
-	public void openLogin() {
+	public void getLogin() {
 		
 	}
 	

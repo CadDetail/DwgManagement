@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name="sysrole")
 public class SysRole implements Serializable {
+	private static final long serialVersionUID = 2171365480973491163L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "roleId")

@@ -88,7 +88,7 @@ public class SysUserService {
 	 * 根据salt对明文密码进行加密
 	 * @param originalPassword
 	 * @param salt
-	 * @param hashIterations
+	 * @param hashIterations, 散列的次数，比如散列两次，相当于 md5(md5(""));
 	 * @return
 	 */
 	public String generatePassword(String originalPassword, String salt, int hashIterations) {

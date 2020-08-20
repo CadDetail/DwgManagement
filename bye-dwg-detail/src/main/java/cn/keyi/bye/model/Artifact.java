@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name="artifact")
 public class Artifact  implements Serializable {
+	private static final long serialVersionUID = -4171643218110052448L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "artifactId")

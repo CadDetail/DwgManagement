@@ -138,7 +138,11 @@
 						data: {"oldpassword" : oldpassword, "newpassword" : newpassword1},
 						success: function(result) {
 							if(result.status == 1) {
-								window.location = "/logout";
+								Swal.fire({title: '修改成功，请重新登录！', position: 'top'}).then((result) => {
+									  if (result.value) {
+										window.location = "/logout";
+									  }
+								});
 							} else {
 								myAlert(result.message);
 							}

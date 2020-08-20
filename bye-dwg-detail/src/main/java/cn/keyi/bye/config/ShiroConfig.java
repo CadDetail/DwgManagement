@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -22,44 +21,33 @@ import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 @Configuration
 public class ShiroConfig {
 	
-	@Bean
-	public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
-		System.out.println("ShiroConfiguration.shiroFilter()");
-		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();		
-		shiroFilterFactoryBean.setLoginUrl("/login");	// 登录页面		
-		shiroFilterFactoryBean.setSuccessUrl("/index");	// 登录成功后要跳转的链接		
-		shiroFilterFactoryBean.setUnauthorizedUrl("/unauthorized");	// 未授权页面
-		shiroFilterFactoryBean.setSecurityManager(securityManager);	// 安全管理器		
-		// 过滤链定义，从上向下顺序执行，一般将 /** 放在最为下边（这是一个坑，一不小心代码就不好使了）
-	    // authc: 所有 url 都必须认证通过才可以访问；anon: 所有 url 都可以匿名访问
-		Map<String,String> filterChainDefinitionMap = new LinkedHashMap<String, String>();	
-		filterChainDefinitionMap.put("/login", "anon");
-		filterChainDefinitionMap.put("/static/**", "anon");
-		filterChainDefinitionMap.put("/favicon.ico", "anon");
-		filterChainDefinitionMap.put("/css/**", "anon");
-		filterChainDefinitionMap.put("/img/**", "anon");
-		filterChainDefinitionMap.put("/js/**", "anon");
-		filterChainDefinitionMap.put("/plugins/**", "anon");
-		filterChainDefinitionMap.put("/files/**", "anon");
-		filterChainDefinitionMap.put("/logout", "logout");	// 退出过滤器，具体退出代码由 Shiro 自身实现	
-		// filterChainDefinitionMap.put("/**", "authc");
-		filterChainDefinitionMap.put("/**", "user"); // user权限是配置记住我或认证通过可以访问
-		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);	// 拦截器
-		return shiroFilterFactoryBean;
-	}
-
 	/**
-	 * 凭证匹配器（由于我们的密码校验交给 Shiro 的 SimpleAuthenticationInfo 进行处理了 ）
+	 * @ shiro的过滤器
+	 * @param securityManager
 	 * @return
 	 */
 	@Bean
-	public HashedCredentialsMatcher hashedCredentialsMatcher(){
-		HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
-		// 散列算法：这里使用 MD5 算法
-		hashedCredentialsMatcher.setHashAlgorithmName("md5");
-		// 散列的次数，比如散列两次，相当于 md5(md5(""));
-		hashedCredentialsMatcher.setHashIterations(2);
-		return hashedCredentialsMatcher;
+	public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
+		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+		shiroFilterFactoryBean.setSecurityManager(securityManager);	// 安全管理器
+		shiroFilterFactoryBean.setLoginUrl("/login");	// 登录页面		
+		shiroFilterFactoryBean.setSuccessUrl("/index");	// 登录成功后要跳转的链接		
+		shiroFilterFactoryBean.setUnauthorizedUrl("/unauthorized");	// 未授权页面				
+		// 过滤链定义, 从上向下顺序执行, 一般将 /** 放在最为下边
+	    // authc: 所有 url 都必须认证通过才可以访问；anon: 所有 url 都可以匿名访问
+		Map<String,String> filterChainDefinitionMap = new LinkedHashMap<String, String>();	
+		filterChainDefinitionMap.put("/logout"		, "logout");	// 退出过滤器, 具体退出代码由Shiro自身实现
+		filterChainDefinitionMap.put("/favicon.ico"	, "anon");
+		filterChainDefinitionMap.put("/static/**"	, "anon");		
+		filterChainDefinitionMap.put("/css/**"		, "anon");
+		filterChainDefinitionMap.put("/img/**"		, "anon");
+		filterChainDefinitionMap.put("/js/**"		, "anon");
+		filterChainDefinitionMap.put("/plugins/**"	, "anon");
+		filterChainDefinitionMap.put("/files/**"	, "anon");			
+		//filterChainDefinitionMap.put("/**"		, "authc");
+		filterChainDefinitionMap.put("/**"			, "user");		// user权限是配置记住我或认证通过可以访问
+		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);	// 拦截器
+		return shiroFilterFactoryBean;
 	}
 
 	/**
@@ -69,7 +57,6 @@ public class ShiroConfig {
 	@Bean
 	public MyShiroRealm myShiroRealm(){
 		MyShiroRealm myShiroRealm = new MyShiroRealm();
-		myShiroRealm.setCredentialsMatcher(hashedCredentialsMatcher());
 		return myShiroRealm;
 	}
 
@@ -81,48 +68,14 @@ public class ShiroConfig {
 	public SecurityManager securityManager(){
 		DefaultWebSecurityManager securityManager =  new DefaultWebSecurityManager();
 		// 设置realm
-		securityManager.setRealm(myShiroRealm());
+		 securityManager.setRealm(myShiroRealm());
 		// 注入记住我管理器
 	    securityManager.setRememberMeManager(rememberMeManager());		
 		return securityManager;
 	}
-
-	/**
-	 * 开启 Shiro aop 注解支持（因为使用代理方式，所以需要开启代码支持）
-	 * @param securityManager
-	 * @return
-	 */
-	@Bean
-	public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager){
-		AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
-		authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
-		return authorizationAttributeSourceAdvisor;
-	}
-
-	@Bean(name="simpleMappingExceptionResolver")
-	public SimpleMappingExceptionResolver createSimpleMappingExceptionResolver() {
-		SimpleMappingExceptionResolver r = new SimpleMappingExceptionResolver();
-		Properties mappings = new Properties();
-		mappings.setProperty("DatabaseException", "databaseError");	// 数据库异常处理
-		mappings.setProperty("UnauthorizedException", "unauthorized");
-		r.setExceptionMappings(mappings);  // None by default
-		r.setDefaultErrorView("error");    // No default
-		r.setExceptionAttribute("ex");     // Default is "exception"
-		//r.setWarnLogCategory("example.MvcLogger");     // No default
-		return r;
-	}
 	
 	/**
-	 * 为了在thymeleaf中使用shiro的自定义tag
-	 * @return
-	 */
-	@Bean(name = "shiroDialect")
-    public ShiroDialect shiroDialect(){
-        return new ShiroDialect();
-    }
-	
-	/**
-	 * cookie对象
+	 * @ cookie对象
 	 * @return
 	 */
 	public SimpleCookie rememberMeCookie(){
@@ -134,7 +87,7 @@ public class ShiroConfig {
 	}
 
 	/**
-	 * cookie管理对象——记住我功能
+	 * @ cookie管理对象——记住我功能
 	 * @return
 	 */
 	public CookieRememberMeManager rememberMeManager(){
@@ -144,5 +97,42 @@ public class ShiroConfig {
 	   cookieRememberMeManager.setCipherKey(Base64.decode("3AvVhmFLUs0KTA3Kprsdag=="));
 	   return cookieRememberMeManager;
 	}
+	
+	/*
+	 * @ 在方法内部对异常的类型进行判断, 然后返回合适的 ModelAndView 对象
+	 */
+	@Bean(name="simpleMappingExceptionResolver")
+	public SimpleMappingExceptionResolver createSimpleMappingExceptionResolver() {
+		SimpleMappingExceptionResolver r = new SimpleMappingExceptionResolver();
+		Properties mappings = new Properties();
+		mappings.setProperty("DatabaseException", "databaseError");		// 数据库异常处理
+		mappings.setProperty("UnauthorizedException", "unauthorized");	// 授权异常处理
+		r.setExceptionMappings(mappings);  // None by default
+		r.setDefaultErrorView("error");    // 为所有的异常定义默认的异常处理页面，exceptionMappings未定义的异常使用本默认配置
+		r.setExceptionAttribute("exception");     // 定义异常处理页面用来获取异常信息的变量名，默认名为exception
+		return r;
+	}
+
+	/**
+	 * @ 开启 Shiro aop 注解支持（因为使用代理方式，所以需要开启代码支持）
+	 * @param securityManager
+	 * @return
+	 */
+	@Bean
+	public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager){
+		AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
+		authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
+		return authorizationAttributeSourceAdvisor;
+	}
+
+	/**
+	 * @ 为了在thymeleaf中使用shiro的自定义tag
+	 * @return
+	 */
+	@Bean(name="shiroDialect")
+    public ShiroDialect shiroDialect(){
+        return new ShiroDialect();
+    }	
+	
 	
 }

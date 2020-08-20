@@ -14,6 +14,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="artifactdetail")
 public class ArtifactDetail implements Serializable  {
+	private static final long serialVersionUID = 780143142129176138L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "detailId")

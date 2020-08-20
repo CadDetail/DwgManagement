@@ -153,6 +153,7 @@
 				success: function(result) {
 					$('.select2bs4').select2({
 						theme: 'bootstrap4',
+						language: 'zh-CN',
 						placeholder: '请选择角色',
 						data: result,						
 						allowClear: true
@@ -220,7 +221,7 @@
 		function resetPassword(userId) {
 			userPageIndex = $('#pagination-user').pagination('getSelectedPageNum');
 			Swal.fire({
-				  title: '输入密码',
+				  title: '修改密码',
 				  input: 'password',
 				  inputPlaceholder: '请输入密码',
 				  inputAttributes: {

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name="syspermission")
 public class SysPermission implements Serializable {
+	private static final long serialVersionUID = 7512148035428150546L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "permissionId")
