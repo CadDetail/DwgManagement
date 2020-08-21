@@ -1,7 +1,5 @@
 package cn.keyi.bye.service;
 
-import java.util.Optional;
-
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +31,8 @@ public class SysUserService {
 	 * @return
 	 */
 	public SysUser findByUserId(Long userId) {		
-		Optional<SysUser> findResult = sysUserDao.findById(userId);
-		if(findResult.isPresent()) {
-			return findResult.get();
-		} else {
-			return null;
-		}
+		SysUser findResult = sysUserDao.findByUserId(userId);
+		return findResult;
 	}
 	
 	/**
@@ -78,7 +72,7 @@ public class SysUserService {
 		} catch (Exception e) {		
 			rslt = e.getMessage();
 			if(rslt.contains("ConstraintViolationException")) {
-				rslt = "违反参照完整性，请先删除其在明细中的记录！";
+				rslt = "违反参照完整性，请先删除从表中的相关记录！";
 			}
 		}
 		return rslt;

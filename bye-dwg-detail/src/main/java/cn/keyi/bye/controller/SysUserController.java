@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
 
+import cn.keyi.bye.model.CookieUser;
 import cn.keyi.bye.model.SysPermission;
 import cn.keyi.bye.model.SysRole;
 import cn.keyi.bye.model.SysUser;
@@ -44,8 +46,11 @@ public class SysUserController {
 	 */
 	@RequestMapping("/getLoggedUser")
 	public Object getLoggedUser() {
+		// Subject subject = SecurityUtils.getSubject();
+		// return (SysUser)subject.getPrincipal();
 		Subject subject = SecurityUtils.getSubject();
-		return (SysUser)subject.getPrincipal();
+		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
+		return sysUserService.findByUserName(cookieUser.getUserName());
 	}
 	
 	/**
@@ -60,7 +65,8 @@ public class SysUserController {
 		Map<String, Object> map = new HashMap<>();
 		String oldPassw = request.getParameter("oldpassword");
 		String newPassw = request.getParameter("newpassword");
-		SysUser loggedUser = (SysUser)SecurityUtils.getSubject().getPrincipal();
+		// SysUser loggedUser = (SysUser)SecurityUtils.getSubject().getPrincipal();
+		SysUser loggedUser = (SysUser) getLoggedUser();
 		int hashIterations = 2;
 		String oldPassword = sysUserService.generatePassword(oldPassw, loggedUser.getCredentialsSalt(), hashIterations);
 		if(!oldPassword.equals(loggedUser.getPassword())) {
@@ -90,8 +96,8 @@ public class SysUserController {
 	@RequestMapping("/queryPermissions")
     public Object queryPermissions() {
 		List<String> permissionList = new ArrayList<String>();
-		SysUser userInfo  = (SysUser) getLoggedUser();
-        for(SysRole role: userInfo.getRoles()) {
+		SysUser user = (SysUser) getLoggedUser();
+        for(SysRole role: user.getRoles()) {
             for(SysPermission p: role.getPermissions()) {
             	permissionList.add(p.getPermissionCode());
             }

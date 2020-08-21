@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<html lang="en" xmlns:th="http://www.thymeleaf.org"  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head th:replace="common/head :: common_head(~{::title}, ~{::link})">
     <title>用户管理</title>
     <link rel="stylesheet" href="/plugins/pagination-2.1.5/pagination.css">
@@ -44,7 +44,7 @@
 							  	<form>
 								  <div class="form-row align-items-center">
 								    <div class="col-auto">
-								      <label class="sr-only" for="txtArtifactName">用户姓名</label>
+								      <label class="sr-only" for="txtUserAlias">用户姓名</label>
 								      <div class="input-group mb-2">
 								      	<input type="text" class="form-control" id="txtUserAlias" placeholder="请输入用户姓名...">
 								        <div class="input-group-append">
@@ -55,7 +55,11 @@
 								  </div>
 								</form>	
 							  </div>
-							  <div class="p-2" shiro:hasAnyPermissions="user:add"><button class="btn btn-info" type="button" id="btnNewUser" onclick="newUser()"><i class="fa fa-user"></i>&nbsp;添加用户</button></div>
+							  <div class="p-2" shiro:hasAnyPermissions="user:add">
+							  	<button class="btn btn-info" type="button" id="btnNewUser" onclick="newUser()">
+							  		<i class="fa fa-user mr-2"></i>添加用户
+							  	</button>
+							  </div>
 							</div>
 			          </div>
 			          <!-- /.card-header -->
@@ -153,9 +157,9 @@
 				success: function(result) {
 					$('.select2bs4').select2({
 						theme: 'bootstrap4',
-						language: 'zh-CN',
+						language: 'zh-CN',						
+						data: result,
 						placeholder: '请选择角色',
-						data: result,						
 						allowClear: true
 					});
 				},
@@ -271,8 +275,8 @@
 			        $.each(response, function (index, item) {
 			          innerHtml += '<div class="col mb-4">';			          
 			          innerHtml += '  <div class="card mb-3 h-100">';
-			          innerHtml += '	  <div class="row no-gutters">';
-			          innerHtml += '	     <div class="col-md-4">';
+			          innerHtml += '	<div class="row no-gutters">';
+			          innerHtml += '	  <div class="col-md-4">';
 			          innerHtml += '	       <img src="/img/user.png" class="card-img" alt="' + item.userAlias + '">';
 			          innerHtml += '      </div>';
 			          innerHtml += '      <div class="col-md-8">';
@@ -285,18 +289,18 @@
 						rolelist.push(role.description);
 					  });
 			          innerHtml += '            <span>角色：<small class="text-muted" id="lblrole' + item.userId + '">' + rolelist.join("，") + '</small></span>';
-			          innerHtml += '          </p>';
+			          innerHtml += '          </p>';			          
 			          innerHtml += '          <div class="d-flex justify-content-end">';
 			          if(permissions.indexOf("user:edit") != -1 || permissions.indexOf("user:add") != -1) {
-			          	innerHtml += "            <button type='button' class='btn btn-success btn-sm' onclick='resetPassword(" + item.userId + ")'><i class='fas fa-key'></i>&nbsp;密码</button>&nbsp;";
+			          	innerHtml += "            <button type='button' class='btn btn-success btn-sm ml-1' onclick='resetPassword(" + item.userId + ")'><i class='fas fa-key mr-1'></i>密码</button>";
 			          }
 			          if(permissions.indexOf("user:edit") != -1) {
-			          	innerHtml += "            <button type='button' class='btn btn-info btn-sm' onclick='editUser(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt'></i>&nbsp;修改</button>&nbsp;";
+			          	innerHtml += "            <button type='button' class='btn btn-info btn-sm ml-1' onclick='editUser(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt mr-1'></i>修改</button>";
 			          }
 			          if(permissions.indexOf("user:del") != -1) {
-			          	innerHtml += "            <button type='button' class='btn btn-danger btn-sm' onclick='deleteUser(" + item.userId + ")'><i class='fas fa-trash'></i>&nbsp;删除</button>";
+			          	innerHtml += "            <button type='button' class='btn btn-danger btn-sm ml-1' onclick='deleteUser(" + item.userId + ")'><i class='fas fa-trash mr-1'></i>删除</button>";
 			          }
-			          innerHtml += '          </div>';
+			          innerHtml += '          </div>';			          
 			          innerHtml += '        </div>';
 			          innerHtml += '      </div>';
 			          innerHtml += '    </div>';

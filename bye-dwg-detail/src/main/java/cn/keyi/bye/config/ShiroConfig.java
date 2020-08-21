@@ -36,16 +36,20 @@ public class ShiroConfig {
 		// 过滤链定义, 从上向下顺序执行, 一般将 /** 放在最为下边
 	    // authc: 所有 url 都必须认证通过才可以访问；anon: 所有 url 都可以匿名访问
 		Map<String,String> filterChainDefinitionMap = new LinkedHashMap<String, String>();	
-		filterChainDefinitionMap.put("/logout"		, "logout");	// 退出过滤器, 具体退出代码由Shiro自身实现
 		filterChainDefinitionMap.put("/favicon.ico"	, "anon");
+		filterChainDefinitionMap.put("/login"		, "anon");
+		filterChainDefinitionMap.put("/logout"		, "logout");	// 退出过滤器, 具体退出代码由Shiro自身实现
 		filterChainDefinitionMap.put("/static/**"	, "anon");		
 		filterChainDefinitionMap.put("/css/**"		, "anon");
 		filterChainDefinitionMap.put("/img/**"		, "anon");
 		filterChainDefinitionMap.put("/js/**"		, "anon");
 		filterChainDefinitionMap.put("/plugins/**"	, "anon");
-		filterChainDefinitionMap.put("/files/**"	, "anon");			
-		//filterChainDefinitionMap.put("/**"		, "authc");
-		filterChainDefinitionMap.put("/**"			, "user");		// user权限是配置记住我或认证通过可以访问
+		filterChainDefinitionMap.put("/files/**"	, "anon");
+		// user权限用于配置“记住我”或认证通过可以访问
+		filterChainDefinitionMap.put("/"			, "user");		
+		filterChainDefinitionMap.put("/index"		, "user");
+		// 对于“记住我”, 只允许进入到首页, 其它功能必须重新登录
+		filterChainDefinitionMap.put("/**"			, "authc");		
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);	// 拦截器
 		return shiroFilterFactoryBean;
 	}
