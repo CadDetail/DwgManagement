@@ -87,8 +87,8 @@ public class HomeController {
 	@RequestMapping({"/", "/index"})
     public String index() {
         return "index";
-    }
-	
+    }	
+
 	@RequestMapping("/user")
 	@RequiresPermissions("user:view")
     public String user() {

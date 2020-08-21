@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresUser;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -45,6 +46,7 @@ public class SysUserController {
 	 * @return
 	 */
 	@RequestMapping("/getLoggedUser")
+	@RequiresUser
 	public Object getLoggedUser() {
 		// Subject subject = SecurityUtils.getSubject();
 		// return (SysUser)subject.getPrincipal();
@@ -61,6 +63,7 @@ public class SysUserController {
 	 * @return
 	 */
 	@RequestMapping("/modifyPassword")
+	@RequiresUser
 	public Object modifyPassword(HttpServletRequest request) {
 		Map<String, Object> map = new HashMap<>();
 		String oldPassw = request.getParameter("oldpassword");
@@ -94,6 +97,7 @@ public class SysUserController {
 	 * @return
 	 */
 	@RequestMapping("/queryPermissions")
+	@RequiresUser
     public Object queryPermissions() {
 		List<String> permissionList = new ArrayList<String>();
 		SysUser user = (SysUser) getLoggedUser();

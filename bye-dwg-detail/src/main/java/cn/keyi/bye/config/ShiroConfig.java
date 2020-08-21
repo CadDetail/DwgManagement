@@ -48,8 +48,9 @@ public class ShiroConfig {
 		// user权限用于配置“记住我”或认证通过可以访问
 		filterChainDefinitionMap.put("/"			, "user");		
 		filterChainDefinitionMap.put("/index"		, "user");
+		filterChainDefinitionMap.put("/userInfo/**"	, "user");
 		// 对于“记住我”, 只允许进入到首页, 其它功能必须重新登录
-		filterChainDefinitionMap.put("/**"			, "authc");		
+		filterChainDefinitionMap.put("/**"			, "authc");	
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);	// 拦截器
 		return shiroFilterFactoryBean;
 	}
