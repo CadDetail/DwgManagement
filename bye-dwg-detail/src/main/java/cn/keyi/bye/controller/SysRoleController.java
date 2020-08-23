@@ -67,7 +67,7 @@ public class SysRoleController {
 	@RequestMapping("/saveRole")
 	@RequiresPermissions(value={"role:add","role:edit"},logical=Logical.OR)
 	public Object saveRole(HttpServletRequest request) {
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		SysRole role = null;
 		// 修改模式
 		if(request.getParameter("id") != null) {
@@ -117,7 +117,7 @@ public class SysRoleController {
 	@RequestMapping("/deleteRole")
 	@RequiresPermissions("role:del")
 	public Object deleteRole(Long roleId) {
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		String rslt = sysRoleService.deleteRole(roleId);
 		if(rslt.isEmpty()) {
 			map.put("status", 1);

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import cn.keyi.bye.dao.ArtifactDao;
 import cn.keyi.bye.model.Artifact;
 
@@ -122,5 +121,6 @@ public class ArtifactService {
 	public Long getArtifactCount(Short productFlag) {
 		return artifactDao.countByProductFlag(productFlag);
 	}
+	
 	
 }

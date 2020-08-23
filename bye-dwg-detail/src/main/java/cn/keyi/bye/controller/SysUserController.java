@@ -65,7 +65,7 @@ public class SysUserController {
 	@RequestMapping("/modifyPassword")
 	@RequiresUser
 	public Object modifyPassword(HttpServletRequest request) {
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		String oldPassw = request.getParameter("oldpassword");
 		String newPassw = request.getParameter("newpassword");
 		// SysUser loggedUser = (SysUser)SecurityUtils.getSubject().getPrincipal();
@@ -125,7 +125,7 @@ public class SysUserController {
 	@RequestMapping("/saveUser")
 	@RequiresPermissions(value={"user:add","user:edit"},logical=Logical.OR)
 	public Object saveUser(HttpServletRequest request) {
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		SysUser user = null;
 		// 修改模式
 		if(request.getParameter("id") != null) {
@@ -180,7 +180,7 @@ public class SysUserController {
 	@RequestMapping("/deleteUser")
 	@RequiresPermissions("user:del")
 	public Object deleteUser(Long userId) {
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		String rslt = sysUserService.deleteUser(userId);
 		if(rslt.isEmpty()) {
 			map.put("status", 1);
@@ -195,7 +195,7 @@ public class SysUserController {
 	@RequestMapping("/resetPassword")
 	@RequiresPermissions(value={"user:add","user:edit"},logical=Logical.OR)
 	public Object resetPassword(HttpServletRequest request, @RequestBody JSONObject params) {
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		SysUser user = null;
 		//Long id = Long.valueOf(request.getParameter("id"));
 		Long id = params.getLong("id");

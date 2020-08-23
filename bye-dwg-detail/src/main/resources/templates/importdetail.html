@@ -1,7 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="common/head :: common_head(~{::title}, ~{})">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head th:replace="common/head :: common_head(~{::title}, ~{::style})">
     <title>明细导入</title>
+    <style type="text/css"> 
+    	.custom-file-input:lang(zh) ~ .custom-file-label::after { 
+    		content: "浏览";
+    		
+    	}	
+    </style> 
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
     <!-- Site wrapper -->
@@ -35,8 +41,62 @@
 
             <!-- Main content -->
             <section class="content">
-                <div class="container-fluid">
+                <div class="container-fluid">                
                 
+	                <div class="row">
+			          <!-- left column -->
+			          <div class="col-md-12">
+			          	<div class="alert alert-danger alert-dismissible">
+							<h5><i class="icon fas fa-exclamation-triangle"></i> 警告</h5>
+		                  	将 MDB 文件中的明细数据导入数据库时，某些零件可能会与库中已有零件产生冲突，这完全取决于设计零件时设定的图号！
+		                </div>			          	
+			            <!-- general form elements -->
+			            <div class="card card-info card-outline">
+			              <div class="card-header">
+			                <h3 class="card-title">将 MDB 文件中的明细数据上传到数据库</h3>
+			              </div>
+			              <!-- /.card-header -->
+			              <!-- form start -->
+			              <form role="form" id="frmUploadFile">
+			                <div class="card-body">				              
+			                  <div class="form-group">
+			                    <label for="">冲突操作：</label>			                   
+			                  	<div class="icheck-success mt-2">
+			                        <input type="radio" id="radioConflict1" name="radioConflict" value="1" checked>
+			                        <label for="radioConflict1" class="text-success">忽略冲突零件</label>
+			                    </div>
+			                  	<div class="icheck-danger">
+			                        <input type="radio" id="radioConflict2" name="radioConflict" value="2">
+			                        <label for="radioConflict2" class="text-danger">覆盖库中零件</label>
+			                    </div>			                    
+			                  </div>
+			                  <div class="form-group mt-5">
+			                    <label for="inputFile">明细 MDB 文件：</label>
+			                    <div class="input-group mt-2">
+			                      <div class="custom-file">
+			                        <input type="file" class="custom-file-input" id="inputFile" name="uploadFile" lang="zh">
+			                        <label class="custom-file-label" for="inputFile" id="lblUploadFile">请选择上传文件...</label>
+			                      </div>
+			                      <div class="input-group-append">
+			                        <button type="button" class="input-group-text" id="btnUploadFile">上传</button>
+			                      </div>
+			                    </div>
+			                  </div>			                  
+			                  
+			                  
+			                  
+			                </div>
+			                <!-- /.card-body -->
+			
+			                <div class="card-footer" shiro:hasAnyPermissions="detail:import">
+			                  <button type="button" class="btn btn-info" id="btnSubmit">提交</button>
+			                </div>
+			              </form>
+			            </div>
+			            <!-- /.card -->
+			           </div>
+			       	</div>
+			       	<!-- /.row -->
                 
                 </div>
             </section>
@@ -49,10 +109,87 @@
     </div>
     <!-- ./wrapper -->    
 	<div th:replace="common/footer :: common_js"></div>
+	<!-- bs-custom-file-input -->
+	<script src="/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 	<script type="text/javascript">	
 		$(document).ready(function() {
-
+			
+			var fileAtSrvr = "";
+			
+			// 初始化 custom-file-input
+			bsCustomFileInput.init();
+			
+			// 通过浏览按钮选择了不同的上传文件
+			$("#inputFile").change(function() {
+				if(fileAtSrvr != "") {
+					$.post("/artifact/deleteUploadMdbFile", {fileAtSrvr: fileAtSrvr});
+				}
+			});
+			
+			// 上传按钮单击事件
+			$("#btnUploadFile").click(function() {
+				let readyFile = $("#lblUploadFile").html();
+				let fileSuffix = readyFile.substring(readyFile.lastIndexOf(".") + 1).toLowerCase();
+				if(fileSuffix == "") {
+					Swal.fire("还未选择要上传的 MDB 文件！");
+					return;
+				}
+				else if(fileSuffix != "mdb") {
+					Swal.fire("选择的文件不是 MDB 类型！");
+					return;
+				}
+				// 之前已经上传过文件了
+				if(fileAtSrvr != "") {
+					$.post("/artifact/deleteUploadMdbFile", {fileAtSrvr: fileAtSrvr});
+				}
+				// 开始上传文件
+				$("#btnUploadFile").attr("disabled", true);	// 设置上传按钮不可用
+				$.ajax({
+			        url: "/upload",
+			        type: 'POST',
+			        cache: false,
+			        data: new FormData($('#frmUploadFile')[0]),
+			        processData: false,
+			        contentType: false,
+			        dataType: "json",
+			        success: function(data) {
+			            if(data.status == 1) {
+			            	fileAtSrvr = data.message;
+			            	Swal.fire('成功', "明细数据文件上传完毕，请单击提交按钮！", 'success');
+			            } else {
+			                Swal.fire('错误', data.message, 'error');
+			            }
+			            $("#btnUploadFile").removeAttr("disabled"); // 上传按钮恢复可用
+			        }
+			    });
+			});
 		    
+			// 提交按钮单击事件
+			$("#btnSubmit").click(function() {
+				let conflictMode = $("input[type='radio']:checked").val();
+				if(fileAtSrvr == "") {
+					Swal.fire("还未上传明细数据文件！");
+					return;
+				}
+				// 开始提交，进入后台进行数据导入操作
+				$.ajax({
+					type: "POST",
+					url:  "/artifact/importArtifact",
+					data: {conflictMode: conflictMode, fileAtSrvr: fileAtSrvr},					
+					success: function(result) {
+						if(result.status == 1) {
+							Swal.fire('成功', result.message, 'success');
+						} else {
+							Swal.fire('错误', result.message, 'error');
+						}
+						// 提交完成后, 进行重置操作
+						fileAtSrvr = "";
+						$('#frmUploadFile')[0].reset();
+					},
+					dataType: "json"
+				});
+			});
+			
 		});
 	</script>	
 </body>

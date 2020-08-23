@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.keyi.bye.model.Artifact;
 import cn.keyi.bye.model.ArtifactDetail;
+import cn.keyi.bye.service.AccessService;
 import cn.keyi.bye.service.ArtifactDetailService;
 import cn.keyi.bye.service.ArtifactService;
 
@@ -29,6 +30,8 @@ public class ArtifactController {
 	ArtifactService artifactService;
 	@Autowired
 	ArtifactDetailService artifactDetailService;
+	@Autowired
+	AccessService accessService;
 	
 	/**
 	 * comment: 以分页的方式查询产品（工件）列表
@@ -69,7 +72,7 @@ public class ArtifactController {
 	public Object findArtifactById(Long artifactId) {
 		Artifact artifact = artifactService.getArtifactById(artifactId);
 		if(artifact == null) {
-			Map<String, Object> map = new HashMap<>();
+			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("status", 0);
 			map.put("message", "未找到指定的明细记录！");
 			return map;
@@ -82,7 +85,7 @@ public class ArtifactController {
 	public Object findArtifactByCode(String artifactCode) {
 		Artifact artifact = artifactService.getArtifactByCode(artifactCode);
 		if(artifact == null) {
-			Map<String, Object> map = new HashMap<>();
+			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("status", 0);
 			map.put("message", "未找到指定零件！");
 			return map;
@@ -136,7 +139,7 @@ public class ArtifactController {
 		artifact.setProductFlag(Short.valueOf(request.getParameter("productFlag")));
 		artifact.setProductModel(request.getParameter("productModel"));
 		artifact.setArtifactMemo(request.getParameter("artifactMemo"));
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		String rslt = artifactService.saveArtifact(artifact);
 		if(rslt.isEmpty()) {
 			map.put("status", 1);
@@ -151,7 +154,7 @@ public class ArtifactController {
 	@RequestMapping("/deleteArtifact")
 	@RequiresPermissions("artifact:del")
 	public Object deleteArtifact(Long artifactId) {
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		String rslt = artifactService.deleteArtifact(artifactId);
 		if(rslt.isEmpty()) {
 			map.put("status", 1);
@@ -161,6 +164,46 @@ public class ArtifactController {
 			map.put("message", rslt);
 		}
 		return map;	
+	}
+	
+	@RequestMapping("/importArtifact")
+	@RequiresPermissions("detail:import")
+	public Object importArtifact(HttpServletRequest request) {		
+		int mode = Integer.valueOf(request.getParameter("conflictMode"));
+		String mdbPhysicalFile = request.getParameter("fileAtSrvr");		
+		Map<String, Object> map = new HashMap<String, Object>();
+		int rslt = 0;
+		try {
+			List<Artifact> artifacts = accessService.getArtifacts(mdbPhysicalFile);
+			List<Map<String, Object>> details = accessService.getArtifactDetail(mdbPhysicalFile);
+			rslt = accessService.batchImportArtifactDetail(artifacts, details, mode);			
+			if(rslt == 1) {
+				map.put("message", "明细数据导入成功！");
+			} else {
+				map.put("message", "明细数据导入失败！");
+			}
+		} catch (Exception e) {
+			map.put("message", e.getMessage());
+		}
+		map.put("status", rslt);
+		//最后, 不管导入成功不成功, 都把上传的mdb文件删了
+		accessService.deleteUploadMdbFile(mdbPhysicalFile);
+		return map;
+	}
+	
+	@RequestMapping("/deleteUploadMdbFile")
+	public Object deleteUploadMdbFile(HttpServletRequest request) {
+		String mdbPhysicalFile = request.getParameter("fileAtSrvr");
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			accessService.deleteUploadMdbFile(mdbPhysicalFile);
+			map.put("status", 1);
+			map.put("message", "文件删除成功！");
+		} catch(Exception e) {
+			map.put("status", 0);
+			map.put("message", e.getMessage());
+		}
+		return map;		
 	}
 	
 	

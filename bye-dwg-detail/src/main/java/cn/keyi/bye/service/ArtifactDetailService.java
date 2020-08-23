@@ -54,8 +54,8 @@ public class ArtifactDetailService {
 	 * @param salveId
 	 * @return
 	 */
-	public List<ArtifactDetail> getDetailByMasterIdAndSlaveId(Long masterId, Long salveId) {
-		return artifactDetailDao.findByMasterArtifactIdAndSlaveArtifactId(masterId, salveId);
+	public List<ArtifactDetail> getDetailByMasterIdAndSlaveId(Long masterId, Long slaveId) {
+		return artifactDetailDao.findByMasterArtifactIdAndSlaveArtifactId(masterId, slaveId);
 	}
 	
 	/**
@@ -109,4 +109,5 @@ public class ArtifactDetailService {
 		}
 		return rslt;
 	}
+
 }

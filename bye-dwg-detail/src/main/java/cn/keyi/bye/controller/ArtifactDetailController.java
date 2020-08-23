@@ -31,7 +31,7 @@ public class ArtifactDetailController {
 	public Object findDetailById(Long detailId) {
 		ArtifactDetail detail = artifactDetailService.getArtifactDetailById(detailId);
 		if(detail == null) {
-			Map<String, Object> map = new HashMap<>();
+			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("status", 0);
 			map.put("message", "未找到指定的明细记录！");
 			return map;
@@ -43,7 +43,7 @@ public class ArtifactDetailController {
 	@RequestMapping("/deleteDetail")
 	@RequiresPermissions("detail:del")
 	public Object deleteDetail(Long detailId) {
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		String rslt = artifactDetailService.deleteArtifactDetail(detailId);
 		if(rslt.isEmpty()) {
 			map.put("status", 1);
@@ -72,7 +72,7 @@ public class ArtifactDetailController {
 		Artifact son = artifactService.getArtifactByCode(artifactCode);
 		detail.setMaster(parent);
 		detail.setSlave(son);
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		List<ArtifactDetail> existDetails = artifactDetailService.getDetailByMasterIdAndSlaveId(parentId, son.getArtifactId());
 		// 新增模式下, 先判断明细中是不是此零件已在记录中
 		if(detail.getDetailId() == null && existDetails.size() > 0) {
@@ -94,7 +94,7 @@ public class ArtifactDetailController {
 	@RequestMapping("/saveArtifactInspect")
 	@RequiresPermissions("detail:check")
 	public Object saveArtifactInspect(HttpServletRequest request) {
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		if(request.getParameter("id") == null) {
 			map.put("status", 0);
 			map.put("message", "未获取到明细记录的ID！");
