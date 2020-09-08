@@ -42,7 +42,6 @@
 	<dependency>
 	  <groupId>mysql</groupId>
 	  <artifactId>mysql-connector-java</artifactId>
-	  <scope>runtime</scope>
 	</dependency>
 	<dependency>
 	  <groupId>org.springframework.boot</groupId>
@@ -82,4 +81,25 @@
 	    <version>5.0.0</version>
 	</dependency>
   </dependencies>
+  
+  <build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+                <!-- 工程主入口-->
+                <mainClass>cn.keyi.bye.ByeCadApplication</mainClass>
+            </configuration>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>repackage</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+  </build>
+  
 </project>
