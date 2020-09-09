@@ -24,7 +24,7 @@
       <h3 class="login-box-msg">明细管理系统</h3>
       <form action="/login" method="post">
         <div class="input-group mb-3">
-          <input id="username" name="username" type="text" class="form-control" required placeholder="账号" value="admin">
+          <input id="username" name="username" type="text" class="form-control" required placeholder="账号" value="">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-user"></span>
@@ -32,7 +32,7 @@
           </div>
         </div>
         <div class="input-group mb-3">
-          <input id="password" name="password" type="password" class="form-control" required placeholder="密码" value="123456">
+          <input id="password" name="password" type="password" class="form-control" required placeholder="密码" value="">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>
@@ -64,46 +64,7 @@
 <script type="text/javascript" src="/plugins/sweetalert2/sweetalert2.min.js"></script>
 <!-- AdminLTE App -->
 <script type="text/javascript" src="/js/adminlte.min.js"></script>
-<script type="text/javascript">
-	//自定义的弹出对话框
-	function myAlert(info) {
-		Swal.fire({
-			toast: true,
-			position: 'top',
-			padding: '1em',
-			html: '<span style="color:#ffffff"><i class="icon fas fa-exclamation-triangle"></i>&nbsp;&nbsp;' + info + '</span>',
-			showConfirmButton: false,
-			background: '#dc3545',
-			timer: 3000
-		});
-	}
-
-	$(document).ready(function() {		
-		
-		sessionStorage.clear();
-		
-		// 提交登录
-		$("#dologin").click(function() {
-			var username = $("#username").val();
-			var password = $("#password").val();
-			var rememberMe = $('#rememberMe').is(':checked');
-			if(username == "" || password == "") {
-				myAlert('账号和密码均不能为空！');
-				return;
-			}
-			$.post("/login", {
-				"username" : username,
-				"password" : password,
-				"rememberMe" : rememberMe
-			}, function(result) {
-				if (result.status == 1) {
-					location.href = "/index";
-				} else {
-					myAlert(result.message);
-				}
-			});
-		});
-	});
-</script>
+<!-- login -->
+<script type="text/javascript" src="/js/pages/login.js"></script>
 </body>
 </html>

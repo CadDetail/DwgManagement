@@ -197,33 +197,7 @@
 	<!-- Tempusdominus Bootstrap 4 -->
 	<script type="text/javascript" src="/plugins/moment/moment-with-locales.min.js"></script>
 	<script type="text/javascript" src="/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
-	<script type="text/javascript">	
-		$(document).ready(function() {
-			
-			// 取消活动菜单的反亮显示
-			$(".sidebar .nav-link").removeClass("active");
-			
-			  // The Calender
-			  $('#calendar').datetimepicker({
-			    format: 'L',
-			    locale: 'zh-cn',
-			    inline: true,
-			    calendarWeeks: true
-			  })
-						
-			$.ajax({
-				type: "GET",
-				url:  "/getCountInfo",
-				success: function(result) {	
-					$("#lblCntUser").html(result.user);
-					$("#lblCntRole").html(result.role);
-					$("#lblCntPermission").html(result.permission);
-					$("#lblCntArtifact").html(result.artifact);
-				},
-			    dataType: "json"
-			});	
-   
-		});
-	</script>	
+	<!-- index -->
+	<script type="text/javascript" src="/js/pages/index.js"> </script>	
 </body>
 </html>
