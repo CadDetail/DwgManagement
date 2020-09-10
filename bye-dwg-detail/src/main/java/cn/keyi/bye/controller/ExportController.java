@@ -1,7 +1,9 @@
 package cn.keyi.bye.controller;
 
-import java.io.*;
-import java.net.URLDecoder;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,12 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,20 +46,8 @@ public class ExportController {
 		if(master != null) {			
 			artifactDetailService.findRecursiveDetailByMaster(master, times, listDetail);
 		}
-		// 处理Excel表格
-		File path = new File(ResourceUtils.getURL("classpath:").getPath());
-		String xlsPath = new File(path.getAbsolutePath(), "/static/files/").toString();
-		String xlsTemplate = URLDecoder.decode(xlsPath, "utf-8") + "\\DetailTemplate.xls";
-		//System.out.println(xlsTemplate);
-		//xlsTemplate = "E:\\我的教研\\2020白云渐变\\DwgManagement\\bye-dwg-detail\\target\\classes\\static\\files\\DetailTemplate.xls";
-		InputStream xlsFile = null;
-		try {
-			xlsFile = new FileInputStream(xlsTemplate);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(xlsFile == null) { return; }
+		// 处理Excel表格	
+		InputStream xlsFile = this.getClass().getResourceAsStream("/static/files/DetailTemplate.xls");
 		// 创建 HSSFWorkbook 对象
 		HSSFWorkbook wb = null;
 		try {
