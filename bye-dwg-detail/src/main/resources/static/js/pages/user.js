@@ -8,15 +8,22 @@
 				type: "POST",
 				url:  "/roleInfo/getRolesForSelect2",
 				success: function(result) {
+					allRoles = result;
 					$('.select2bs4').select2({
 						theme: 'bootstrap4',
-						language: 'zh-CN',						
-						data: result,
-						placeholder: '请选择角色',
-						allowClear: true
+						data: result
 					});
 				},
 				dataType: "json"
+			});
+		}
+		
+		function refreshSelect2() {
+			$('.select2bs4').select2({
+				theme: 'bootstrap4',
+				language: 'zh-CN',
+				placeholder: '请选择角色',
+				allowClear: true
 			});
 		}
 		
@@ -176,14 +183,19 @@
 		
 		$(document).ready(function() {
 			var container = $("#userCardBody");	
-			// 初始加载所有用户
+			// 初始加载所有用户			
 			doPagination("");			
 			// 查询按钮事件
 			$("#btnFindUsers").click(function() {
 				doPagination($("#txtUserAlias").val());
 			});
-			// Initialize Select2 Elements
+			// 获取角色列表
 			getAllRoles();
+			// 对话框加载完毕事件
+			$('#modal-user').on('shown.bs.modal', function (e) {
+				// Refresh Select2 Elements
+				refreshSelect2();
+			});			
 			// 保存按钮事件
 			$("#btnSaveUser").click(function() {				
 				var userName  = $("#dlgUserName").val();

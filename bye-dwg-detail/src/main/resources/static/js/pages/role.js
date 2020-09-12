@@ -10,13 +10,19 @@
 				success: function(result) {
 					$('.select2bs4').select2({
 						theme: 'bootstrap4',
-						language: 'zh-CN',
-						placeholder: '请选择权限',
-						data: result,						
-						allowClear: true
+						data: result
 					});
 				},
 				dataType: "json"
+			});
+		}
+		
+		function refreshSelect2() {
+			$('.select2bs4').select2({
+				theme: 'bootstrap4',
+				language: 'zh-CN',
+				placeholder: '请选择权限',
+				allowClear: true
 			});
 		}
 		
@@ -146,8 +152,13 @@
 			$("#btnFindRoles").click(function() {
 				doPagination($("#txtRoleAlias").val());
 			});
-			// Initialize Select2 Elements
+			// 获取所有权限列表
 			getAllPermissions();
+			// 对话框加载完毕事件
+			$('#modal-role').on('shown.bs.modal', function (e) {
+				// Refresh Select2 Elements
+				refreshSelect2();
+			});	
 			// 保存按钮事件
 			$("#btnSaveRole").click(function() {				
 				var roleName  = $("#dlgRoleName").val();
