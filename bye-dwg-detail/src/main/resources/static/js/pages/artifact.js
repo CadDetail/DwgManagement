@@ -28,10 +28,12 @@
 				columns: [
 					{ data: 'artifactId', visible: false},
 					{ data: null, orderable: false},
-					{ data: 'artifactName' },
-		            { data: 'artifactCode' },
-		            { data: 'weight' },
+					{ data: 'artifactCode' },
+		            { data: 'artifactName' },
+		            { data: 'productModel' },
+		            { data: 'materialCode', orderable: false},
 		            { data: 'materialName', orderable: false},
+		            { data: 'weight' },
 		            { data: 'artifactMemo', orderable: false},
 		            { data: null, orderable: false, "render": function(data, type, row, meta) {
 		            	var htmlOpt = "<div class='d-flex justify-content-end'>";
@@ -159,7 +161,8 @@
 			$("#dlgArtifactName").val(artifact.artifactName);
 			$("#dlgArtifactCode").val(artifact.artifactCode);
 			$("#dlgArtifactWeight").val(artifact.weight);
-			$("#dlgArtifactMaterial").val(artifact.materialName);			
+			$("#dlgMaterialCode").val(artifact.materialCode);
+			$("#dlgMaterialName").val(artifact.materialName);			
 			$("#dlgArtifactFlag")[0].selectedIndex = artifact.productFlag;
 			$("#dlgProductModel").val(artifact.productModel);
 			$("#dlgCanSplit").prop("checked", artifact.canBeSplit);

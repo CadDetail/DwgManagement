@@ -44,7 +44,9 @@ public class AccessService {
 				ResultSet rsDetail = stmt.executeQuery("Select ssdhao, thao From MXSHUJU");
 				while(rsDetail.next()) {
 					parentCodes.add(rsDetail.getNString("ssdhao"));
-					sonCodes.add(rsDetail.getNString("thao"));
+					String thao = rsDetail.getNString("thao");
+					if(thao == null || thao.isEmpty()) { continue; }
+					sonCodes.add(thao);
 				}
 				ResultSet rsArtifact = stmt.executeQuery("Select * From MXBTL");
 				while(rsArtifact.next()) {
@@ -56,8 +58,10 @@ public class AccessService {
 					artifact.setMaterialCode(rsArtifact.getNString("CLDMA"));
 					artifact.setMaterialName(rsArtifact.getNString("CLMING"));
 					String weight = rsArtifact.getNString("ZHLIANG");
-					if(weight != null) { 
+					try { 
 						artifact.setWeight(Float.valueOf(weight));
+					} catch(Exception e) {
+						artifact.setWeight(null);
 					}
 					// 在明细表中的所属代号（ssdhao）列能找到此零件的图号，说明它拥有下级零件，否则没有
 					if(parentCodes.contains(artifactCode)) {
@@ -105,20 +109,45 @@ public class AccessService {
 				rsDetail = stmt.executeQuery("Select * From MXSHUJU");
 				while(rsDetail.next()) {
 					Map<String, Object> detail = new HashMap<String, Object>();
-					detail.put("parentCode", rsDetail.getNString("ssdhao"));
+					String parentCode = rsDetail.getNString("ssdhao");
 					String sonCode = rsDetail.getNString("thao");
-					detail.put("sonCode", sonCode);
+					String artifactName = rsDetail.getNString("mcheng");
+					String materialCode = rsDetail.getNString("cldma");
 					String number = rsDetail.getNString("shliang");
-					if(number == null) {
-						number = "1";	// 数量如果导入时发现为空, 则将其设置为默认值
-					}
-					detail.put("number", Integer.valueOf(number));
+					String weight = rsDetail.getNString("zhliang");
+					String detailMemo = rsDetail.getNString("bzhbzhi");
+					sonCode = (sonCode == null) ? "" : sonCode;
+					artifactName = (artifactName == null) ? "" : artifactName;
+					materialCode = (materialCode == null) ? "" : materialCode;
+					// 数量如果导入时发现为空, 则将其设置为默认值1
+					number = (number == null) ? "1" : number;
+					// 跳过Access中可能存在的空记录行
+					if(String.join("", sonCode, artifactName, materialCode).isEmpty()) {
+						continue;
+					}					
+					detail.put("parentCode", parentCode);
+					detail.put("sonCode", sonCode);					
+					try {
+						detail.put("number", Integer.valueOf(number));
+					} catch(Exception e) {
+						detail.put("number", 0);	// 读出的内容如果不是数字字符串, 则用0代替
+					}					
 					// 在明细表中的所属代号（ssdhao）列能找到此零件的图号，说明它拥有下级零件，否则没有
 					if(parentCodes.contains(sonCode)) {
 						detail.put("needSplit", true);						
 					} else {
 						detail.put("needSplit", false);
 					}
+					// 如果图号（thao）为空或者库中不存在，需要将明细中的有关记录插入到artifact表中，此时需要零件名称和材料代码等信息
+					detail.put("artifactName", artifactName);
+					detail.put("materialCode", materialCode);
+					try {
+						detail.put("weight", Float.valueOf(weight));
+					} catch(Exception e) {
+						detail.put("weight", 0);	// 读出的内容如果不是数字字符串, 则用0代替
+					}
+					// 备注
+					detail.put("detailMemo", detailMemo);
 					detailList.add(detail);
 				}
 				stmt.close();
@@ -133,6 +162,40 @@ public class AccessService {
 		}
 		return detailList;
 	}	
+	
+	// 遍历从Access文件中获取明细记录，检查图号（thao）对应的零件在库中是否已经存在，如果不存在，则先将其插入到artifact表中
+	public int traversingArtifactDetail(List<Map<String, Object>> detailList) {
+		int rslt = 0;
+		try {
+			for(Map<String, Object> map : detailList) {
+				String artifactCode = map.get("sonCode").toString();
+				String artifactName = map.get("artifactName").toString();
+				String materialCode = map.get("materialCode").toString();
+				List<Artifact> existArtifacts = null;
+				if(artifactCode.isEmpty()) {
+					existArtifacts = artifactDao.findByArtifactNameAndMaterialCode(artifactName, materialCode);
+				} else {
+					existArtifacts = artifactDao.findByArtifactCode(artifactCode);				
+				}
+				if(existArtifacts.size() == 0) {
+					Artifact artifact = new Artifact();
+					artifact.setArtifactCode(artifactCode);
+					artifact.setArtifactName(artifactName);
+					artifact.setWeight(Float.valueOf(map.get("weight").toString()));
+					artifact.setMaterialCode(materialCode);
+					artifact.setProductFlag((short) 1); 
+					// 如果 needSplit 值为 true，则表明其可拆分，其它情况默认为不可拆分
+					artifact.setCanBeSplit((Boolean) map.get("needSplit"));	
+					artifactDao.save(artifact);
+				}
+			}
+			rslt =  1;			
+		} catch(Exception e) {
+			throw e;
+		}
+		return rslt;
+	}
+	
 	
 
 	// 批量插入零件, 忽略冲突零件
@@ -190,19 +253,32 @@ public class AccessService {
 			for(Map<String, Object> detail: detailList) {
 				String masterCode = (String) detail.get("parentCode");
 				String slaveCode = (String) detail.get("sonCode");
-				List<ArtifactDetail> existDetailList = artifactDetailDao.findByMasterArtifactCodeAndSlaveArtifactCode(masterCode, slaveCode);
+				String slaveName = (String) detail.get("artifactName");
+				String slaveMaterial = (String) detail.get("materialCode");
+				List<ArtifactDetail> existDetailList;
+				if(slaveCode.isEmpty()) {	// 明细中图号（thao）为空
+					existDetailList = artifactDetailDao.findByMasterArtifactCodeAndSlaveArtifactNameAndSlaveMaterialCode(masterCode, slaveName, slaveMaterial);
+				} else {
+					existDetailList = artifactDetailDao.findByMasterArtifactCodeAndSlaveArtifactCode(masterCode, slaveCode);
+				}				
 				if(existDetailList.size() == 0) {
 					ArtifactDetail artifactDetail = new ArtifactDetail();
 					List<Artifact> masters = artifactDao.findByArtifactCode(masterCode);
 					if(masters.size() > 0) {
 						artifactDetail.setMaster(masters.get(0));
 					}
-					List<Artifact> slaves = artifactDao.findByArtifactCode(slaveCode);
+					List<Artifact> slaves;
+					if(slaveCode.isEmpty()) {
+						slaves = artifactDao.findByArtifactNameAndMaterialCode(slaveName, slaveMaterial);
+					} else {
+						slaves = artifactDao.findByArtifactCode(slaveCode);
+					}
 					if(slaves.size() > 0) {
 						artifactDetail.setSlave(slaves.get(0));
 					}
 					artifactDetail.setNumber((Integer) detail.get("number"));
 					artifactDetail.setNeedSplit((Boolean) detail.get("needSplit"));
+					artifactDetail.setDetailMemo((String) detail.get("detailMemo"));
 					artifactDetailDao.save(artifactDetail);
 				}
 			}
@@ -221,7 +297,14 @@ public class AccessService {
 			for(Map<String, Object> detail: detailList) {
 				String masterCode = (String) detail.get("parentCode");
 				String slaveCode = (String) detail.get("sonCode");
-				List<ArtifactDetail> existDetailList = artifactDetailDao.findByMasterArtifactCodeAndSlaveArtifactCode(masterCode, slaveCode);
+				String slaveName = (String) detail.get("artifactName");
+				String slaveMaterial = (String) detail.get("materialCode");
+				List<ArtifactDetail> existDetailList;
+				if(slaveCode.isEmpty()) {	// 明细中图号（thao）为空
+					existDetailList = artifactDetailDao.findByMasterArtifactCodeAndSlaveArtifactNameAndSlaveMaterialCode(masterCode, slaveName, slaveMaterial);
+				} else {
+					existDetailList = artifactDetailDao.findByMasterArtifactCodeAndSlaveArtifactCode(masterCode, slaveCode);
+				}				
 				ArtifactDetail artifactDetail;
 				if(existDetailList.size() == 0) {
 					artifactDetail = new ArtifactDetail();
@@ -229,7 +312,12 @@ public class AccessService {
 					if(masters.size() > 0) {
 						artifactDetail.setMaster(masters.get(0));
 					}
-					List<Artifact> slaves = artifactDao.findByArtifactCode(slaveCode);
+					List<Artifact> slaves;
+					if(slaveCode.isEmpty()) {
+						slaves = artifactDao.findByArtifactNameAndMaterialCode(slaveName, slaveMaterial);
+					} else {
+						slaves = artifactDao.findByArtifactCode(slaveCode);
+					}
 					if(slaves.size() > 0) {
 						artifactDetail.setSlave(slaves.get(0));
 					}					
@@ -238,6 +326,7 @@ public class AccessService {
 				}
 				artifactDetail.setNumber((Integer) detail.get("number"));
 				artifactDetail.setNeedSplit((Boolean) detail.get("needSplit"));
+				artifactDetail.setDetailMemo((String) detail.get("detailMemo"));
 				artifactDetailDao.save(artifactDetail);
 			}
 			rslt = 1;
@@ -250,19 +339,26 @@ public class AccessService {
 	// 批量导入零件和明细
 	@Transactional(rollbackFor = Exception.class)
 	public int batchImportArtifactDetail(List<Artifact> artifacts, List<Map<String, Object>> details, int mode) throws Exception {
-		int rslt = 0;
+		int rslt = 0;		
 		// mode: 1-忽略冲突零件; 2-覆盖库中零件
 		int artifactOk = (mode == 1) ? insertArtifactsIgnoringConflicts(artifacts) : insertArtifactsCoveringConflicts(artifacts);
-		if(artifactOk == 1) {
-			int detailOk = (mode == 1) ? insertDetailIgnoringConflicts(details) : insertDetailCoveringConflicts(details);
-			if(detailOk == 1) {
-				rslt = 1;
-			} else {
-				throw new Exception("明细导入失败！");
+		if(artifactOk == 1) {				
+			// 先遍历明细记录, 检查是否有些零件先预先插入到 artifact 表中
+			int traversed = traversingArtifactDetail(details);
+			if(traversed == 1) {				
+				int detailOk = (mode == 1) ? insertDetailIgnoringConflicts(details) : insertDetailCoveringConflicts(details);
+				if(detailOk == 1) {
+					rslt = 1;
+				} else {
+					throw new Exception("明细导入失败！");
+				}
+			}
+			else {
+				throw new Exception("处理不在库中的明细异常！");
 			}
 		} else {
 			throw new Exception("零件导入失败！");
-		}
+		}		
 		return rslt;
 	}
 	

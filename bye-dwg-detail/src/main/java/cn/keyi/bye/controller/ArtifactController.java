@@ -128,6 +128,7 @@ public class ArtifactController {
 		}
 		artifact.setArtifactName(request.getParameter("artifactName"));
 		artifact.setArtifactCode(request.getParameter("artifactCode"));
+		artifact.setMaterialCode(request.getParameter("materialCode"));
 		artifact.setMaterialName(request.getParameter("materialName"));
 		artifact.setWeight(Float.valueOf(request.getParameter("weight")));
 		String canBeSplit = request.getParameter("canBeSplit");

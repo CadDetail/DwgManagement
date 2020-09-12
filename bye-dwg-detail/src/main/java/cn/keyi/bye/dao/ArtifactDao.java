@@ -23,5 +23,7 @@ public interface ArtifactDao extends JpaRepository<Artifact, Long> {
 	List<Artifact> findByArtifactCode(String artifactCode);
 	// 统计数据库中产品或零件的数量
 	Long countByProductFlag(Short productFlag);
+	// 根据工件名称和材料代码查找某工件
+	List<Artifact> findByArtifactNameAndMaterialCode(String artifactName, String materialCode);
 	
 }

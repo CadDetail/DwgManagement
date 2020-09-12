@@ -57,12 +57,13 @@
 			html += '<thead>';
 			html += '    <tr>';
 			html += '      <th scope="col">#</th>';
-			html += '      <th scope="col">名称</th>';
 			html += '      <th scope="col">图号</th>';
+			html += '      <th scope="col">名称</th>';
+			html += '      <th scope="col">材料</th>';
 			html += '      <th scope="col">重量</th>';
 			html += '      <th scope="col">数量</th>';
-			html += '      <th scope="col">材料</th>';
-			html += '      <th scope="col">需分解</th>';
+			html += '      <th scope="col">备注</th>';
+			html += '      <th scope="col">需要分拆</th>';
 			html += '      <th scope="col"></th>';
 			html += '    </tr>';
 			html += '</thead>';
@@ -70,23 +71,29 @@
 			$.each(data, function(i, item) {
 				html += '<tr id="tr' + item.detailId + '">';
 				html += '<th scope="row">' + (i+1) + '</th>';
+				html += '<td>' + item.slave.artifactCode + '</td>';
 				if(item.needSplit) {					
 					html += '<td><a href="#" onclick="showMatchingTab(\'tab'+ item.slave.artifactId + '\')">' + item.slave.artifactName + '</a></td>';
 				} else {
 					html += '<td>' + item.slave.artifactName + '</td>';
 				}
-				html += '<td>' + item.slave.artifactCode + '</td>';
+				var materialCode = item.slave.materialCode;
+				if(materialCode == null) { materialCode = ""; }
+				html += '<td>' + materialCode + '</td>';
 				var weight = item.slave.weight;
 				if(weight == null) { weight = ""; };
 				html += '<td>' + weight + '</td>';
-				html += '<td>' + item.number + '</td>';
-				var materialName = item.slave.materialName;
-				if(materialName == null) { materialName = ""; }
-				html += '<td>' + materialName + '</td>';
-				if(item.needSplit) {
-					html += '<td><span class="badge bg-secondary">' + item.needSplit + '</span></td>';
+				if(item.number <= 0) {
+					html += '<td><span class="badge bg-danger">' + item.number + '</span></td>';
 				} else {
-					html += '<td>' + item.needSplit + '</td>';
+					html += '<td>' + item.number + '</td>';
+				}
+				var memo = item.detailMemo;
+				html += '<td>' + (memo == null ? "" : memo) + '</td>';
+				if(item.needSplit) {
+					html += '<td><span class="badge bg-secondary">' + (item.needSplit ? "是" : "否") + '</span></td>';
+				} else {
+					html += '<td>' + (item.needSplit ? "是" : "否") + '</td>';
 				}
 				html += '<td class="project-actions text-right">';				
             	if(permissions.indexOf("detail:edit") != -1) {
@@ -96,7 +103,12 @@
 					html += '<button type="button" class="btn btn-danger btn-sm ml-2" onclick="deleteDetail(' + item.detailId + ')"><i class="fas fa-trash mr-1"></i>删除</button>';
             	}
             	if(permissions.indexOf("detail:check") != -1) {
-					html += "<button type='button' class='btn btn-success btn-sm ml-2' onclick='doInspect(" + JSON.stringify(item) + ")'><i class='fas fa-paw mr-1'></i>会签</button>";
+            		var inspector = item.inspector;
+            		if(inspector != null && inspector != "") {
+            			html += "<button type='button' class='btn btn-secondary btn-sm ml-2' onclick='doInspect(" + JSON.stringify(item) + ")'><i class='fas fa-paw mr-1'></i>会签</button>";
+            		} else {
+            			html += "<button type='button' class='btn btn-success   btn-sm ml-2' onclick='doInspect(" + JSON.stringify(item) + ")'><i class='fas fa-paw mr-1'></i>会签</button>";
+            		}					
             	}
             	html += '</td>';
 				html += '</tr>';
@@ -113,6 +125,8 @@
 		
 		function newDetail() {
 			saveUrl = "/detail/saveArtifactDetail";
+			$("#dlgArtifactCode").removeAttr("readonly");
+			$("#dlgArtifactCode").addClass("is-warning");
 			$("#modal-artifactDetail input").val("");
 			$("#dlgDetailTitle").html("新增明细");
 			$("#modal-artifactDetail").modal("show");
@@ -120,6 +134,8 @@
 		
 		function editDetail(detail) {
 			saveUrl = "/detail/saveArtifactDetail?id=" + detail.detailId;
+			$("#dlgArtifactCode").attr("readonly", true);
+			$("#dlgArtifactCode").removeClass("is-warning");
 			$("#dlgArtifactName").val(detail.slave.artifactName);
 			$("#dlgArtifactCode").val(detail.slave.artifactCode);
 			$("#dlgNumber").val(detail.number);
@@ -241,6 +257,7 @@
 			$("#dlgArtifactCode").change(function() {
 				$("#dlgArtifactName").val("");
 				var code = $(this).val();
+				if(code.trim().length == 0) { return; }
 				$.post("/artifact/findArtifactByCode", {artifactCode: code}, function(data) {
 					if(data.artifactName) {
 						$("#dlgArtifactName").val(data.artifactName);
@@ -258,7 +275,7 @@
  				var number =$("#dlgNumber").val();
  				var needSplit = $("#dlgNeedSplit").is(":checked") ? true : false;
  				var detailMemo = $("#detailMemo").val();
- 				if(artifactName == "" || artifactCode == "" || number == "") {
+ 				if(artifactName == "" || number == "") {
  					myAlert("明细数据输入不完整！")
  					return;
  				}

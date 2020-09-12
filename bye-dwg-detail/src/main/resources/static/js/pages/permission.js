@@ -28,7 +28,9 @@
                     { data: null, orderable: false},
                     { data: 'permissionTitle' },
                     { data: 'permissionCode' },
-                    { data: 'permissionAvailable'},
+                    { data: 'permissionAvailable', "render": function(data) {
+                    	return data ? "<span class='badge bg-success'>有效</span>" : "<span class='badge bg-secondary'>禁用</span>";
+                    }},
                     { data: null, orderable: false, "render": function(row, meta) {
                             var htmlOpt = "<div class='d-flex justify-content-end'>";
                             var permissions = sessionStorage.getItem("permissions");
@@ -69,8 +71,7 @@
             $("#btnSavePermission").click(function() {
                 var permissionTitle = $("#dlgPermissionTitle").val();
                 var permissionCode = $("#dlgPermissionCode").val();
-                var permissionAvailable =$("#dlgPermissionAvailable").val();
-                console.log(permissionAvailable);
+                var permissionAvailable = $("#dlgPermissionAvailable").val();
                 if(permissionTitle == "" || permissionCode == "" || permissionAvailable == "") {
                     myAlert("权限信息输入不完整！")
                     return;

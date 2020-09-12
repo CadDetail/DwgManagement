@@ -80,7 +80,7 @@
 			Swal.fire({
 				  title: '修改密码',
 				  input: 'password',
-				  inputPlaceholder: '请输入密码',
+				  inputPlaceholder: '请输入重置的密码',
 				  inputAttributes: {
 				    autocapitalize: 'off'
 				  },

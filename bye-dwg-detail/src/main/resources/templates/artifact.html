@@ -92,10 +92,12 @@
 				            <tr>
 				                <th>Id</th>
 				                <th>#</th>
-				                <th>名称</th>
 				                <th>图号</th>
+				                <th>名称</th>
+				                <th>产品型号</th>				                
+				                <th>材料代码</th>
+				                <th>材料名称</th>
 				                <th>重量</th>
-				                <th>材料</th>
 				                <th>备注</th>
 				                <th></th>
 				            </tr>
@@ -126,31 +128,37 @@
 		            <form class="form-horizontal" id="frmArtifact">
 		                <div class="card-body">
 		                  <div class="form-group row">
-		                    <label for="dlgArtifactName" class="col-sm-2 col-form-label">名称：</label>
-		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control is-warning" id="dlgArtifactName" name="artifactName" placeholder="名称">
-		                    </div>
-		                  </div>
-		                  <div class="form-group row">
-		                    <label for="dlgArtifactCode" class="col-sm-2 col-form-label">图号：</label>
+		                    <label for="dlgArtifactCode" class="col-sm-2 col-form-label">图号</label>
 		                    <div class="col-sm-10">
 		                      <input type="text" class="form-control is-warning" id="dlgArtifactCode" name="artifactCode" placeholder="图号">
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
-		                    <label for="dlgArtifactWeight" class="col-sm-2 col-form-label">重量：</label>
+		                    <label for="dlgArtifactName" class="col-sm-2 col-form-label">名称</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control is-warning" id="dlgArtifactName" name="artifactName" placeholder="名称">
+		                    </div>
+		                  </div>		                  
+		                  <div class="form-group row">
+		                    <label for="dlgArtifactWeight" class="col-sm-2 col-form-label">重量</label>
 		                    <div class="col-sm-10">
 		                      <input type="number" class="form-control is-warning" id="dlgArtifactWeight" name="weight" placeholder="重量">
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
-		                    <label for="dlgArtifactMaterial" class="col-sm-2 col-form-label">材料：</label>
+		                    <label for="dlgMaterialCode" class="col-sm-2 col-form-label">材料码</label>
 		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgArtifactMaterial" name="materialName" placeholder="材料">
+		                      <input type="text" class="form-control" id="dlgMaterialCode" name="materialCode" placeholder="材料代码">
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
-		                    <label for="dlgArtifactFlag" class="col-sm-2 col-form-label">类型：</label>
+		                    <label for="dlgMaterialName" class="col-sm-2 col-form-label">材料名</label>
+		                    <div class="col-sm-10">
+		                      <input type="text" class="form-control" id="dlgMaterialName" name="materialName" placeholder="材料名称">
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgArtifactFlag" class="col-sm-2 col-form-label">类型</label>
 		                    <div class="col-sm-10">		                      
 		                      <select class="form-control" id="dlgArtifactFlag" name="productFlag">
 		                          <option value ="0">产品</option>
@@ -159,13 +167,13 @@
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
-		                    <label for="dlgProductModel" class="col-sm-2 col-form-label">型号：</label>
+		                    <label for="dlgProductModel" class="col-sm-2 col-form-label">型号</label>
 		                    <div class="col-sm-10">
 		                      <input type="text" class="form-control" id="dlgProductModel" name="productModel" placeholder="产品型号">
 		                    </div>
 		                  </div>	                  
 		                  <div class="form-group row">
-		                  	<label for="" class="col-sm-2 col-form-label">分解：</label>
+		                  	<label for="" class="col-sm-2 col-form-label">分解</label>
 		                    <div class="col-sm-10">
 		                      <div class="icheck-info">
 		                        <input type="checkbox" class="form-check-input" id="dlgCanSplit" name="canBeSplit">
@@ -174,7 +182,7 @@
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
-		                    <label for="dlgArtifactMemo" class="col-sm-2 col-form-label">备注：</label>
+		                    <label for="dlgArtifactMemo" class="col-sm-2 col-form-label">备注</label>
 		                    <div class="col-sm-10">
 		                      <input type="text" class="form-control" id="dlgArtifactMemo" name="artifactMemo" placeholder="备注">
 		                    </div>

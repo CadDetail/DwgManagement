@@ -18,5 +18,7 @@ public interface ArtifactDetailDao extends JpaRepository<ArtifactDetail, Long> {
 	List<ArtifactDetail> findByMasterArtifactIdAndSlaveArtifactId(Long masterId, Long slaveId);
 	// 根据parentArtifactCode和artifactCode查询明细记录
 	List<ArtifactDetail> findByMasterArtifactCodeAndSlaveArtifactCode(String masterCode, String slaveCode);
+	// 根据parentArtifactCode和artifactName、materialCode查询明细记录
+	List<ArtifactDetail> findByMasterArtifactCodeAndSlaveArtifactNameAndSlaveMaterialCode(String masterCode, String slaveName, String slaveMaterial);
 	
 }
