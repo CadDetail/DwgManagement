@@ -61,22 +61,37 @@
 					return;
 				}
 				// 开始提交，进入后台进行数据导入操作
-				$.ajax({
-					type: "POST",
-					url:  "/artifact/importArtifact",
-					data: {conflictMode: conflictMode, fileAtSrvr: fileAtSrvr},					
-					success: function(result) {
-						if(result.status == 1) {
-							Swal.fire('成功', result.message, 'success');
-						} else {
-							Swal.fire('错误', result.message, 'error');
-						}
-						// 提交完成后, 进行重置操作
-						fileAtSrvr = "";
-						$('#frmUploadFile')[0].reset();
-					},
-					dataType: "json"
+				$("#btnSubmit").attr("disabled", true);	// 设置提交按钮不可用
+				Swal.fire({
+					title: '导入明细',
+					text: '正在导入数据，请稍候……',
+					showCloseButton: false,
+					showCancelButton: false,
+					showconfirmButton: false,
+					onBeforeOpen	: () => {
+						Swal.showLoading();
+						$.ajax({
+							type: "POST",
+							url:  "/artifact/importArtifact",
+							data: {conflictMode: conflictMode, fileAtSrvr: fileAtSrvr},					
+							success: function(result) {
+								Swal.close();
+								if(result.status == 1) {									
+									Swal.fire('成功', result.message, 'success');
+								} else {
+									Swal.fire('错误', result.message, 'error');
+								}
+								// 提交完成后, 进行重置操作
+								fileAtSrvr = "";
+								$('#frmUploadFile')[0].reset();
+								$("#btnSubmit").removeAttr("disabled"); // 提交按钮恢复可用
+							},
+							dataType: "json"
+						});
+					}
 				});
+						    
+				
 			});
 			
 		});
