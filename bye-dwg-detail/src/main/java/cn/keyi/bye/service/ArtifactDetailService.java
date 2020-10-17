@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import cn.keyi.bye.dao.ArtifactDao;
 import cn.keyi.bye.dao.ArtifactDetailDao;
 import cn.keyi.bye.model.Artifact;
 import cn.keyi.bye.model.ArtifactDetail;
@@ -19,6 +21,8 @@ public class ArtifactDetailService {
 
 	@Autowired
 	ArtifactDetailDao artifactDetailDao;
+	@Autowired
+	ArtifactDao artifactDao;
 	
 	/**
 	 * comment: 根据一个明细ID获取该明细记录
@@ -89,23 +93,91 @@ public class ArtifactDetailService {
 	 * @param detailId
 	 * @return
 	 */
-	public String deleteArtifactDetail(Long detailId) {
-		String rslt = "";
-		try {
-			artifactDetailDao.deleteById(detailId);
-		} catch (Exception e) {		
-			rslt = e.getMessage();
-		}
+//	public String deleteArtifactDetail(Long detailId) {
+//		String rslt = "";
+//		try {
+//			artifactDetailDao.deleteById(detailId);
+//		} catch (Exception e) {		
+//			rslt = e.getMessage();
+//		}
+//		return rslt;
+//	}
+	
+	/**
+	 * comment: 删除指定的明细记录，，操作的同时要级联删除明细零件
+	 * author : 兴有林栖
+	 * date   : 2020-12-12
+	 * @param detailId
+	 * @return
+	 * @throws Exception 
+	 */
+	@Transactional(rollbackFor = Exception.class)
+	public int deleteArtifactDetail(Long detailId) throws Exception {
+		int rslt = 0;
+		ArtifactDetail detail = this.getArtifactDetailById(detailId);
+		if(detail == null) {
+			throw new Exception("未找到明细记录！");
+		} else {
+			try {
+				artifactDao.deleteById(detail.getSlave().getArtifactId());
+				try {
+					artifactDetailDao.deleteById(detailId);
+					rslt = 1;
+				} catch (Exception e) {		
+					throw e;
+				}
+			} catch (Exception e) {
+				throw e;
+			}			
+		}		
 		return rslt;
 	}
 	
-	
+	/**
+	 * comment: 添加或编辑某产品的明细
+	 * author : 兴有林栖
+	 * date   : 2020-8-14
+	 * @param detailId
+	 * @return
+	 */
 	public String saveArtifactDetail(ArtifactDetail artifactDetail) {
 		String rslt = "";
 		try {
 			artifactDetailDao.save(artifactDetail);
 		} catch (Exception e) {
 			rslt = e.getMessage();
+		}
+		return rslt;
+	}
+	
+	/***
+	 * comment: 添加或编辑某产品的明细，操作的同时要同步更新明细零件
+	 * author : 兴有林栖
+	 * date   : 2020-12-12 
+	 * @param slave
+	 * @param artifactDetail
+	 * @return
+	 * @throws Exception
+	 */
+	@Transactional(rollbackFor = Exception.class)
+	public int saveArtifactDetail(Artifact slave, ArtifactDetail artifactDetail) throws Exception {
+		int rslt = 0;
+		Artifact newArtifact = null;
+		try {
+			newArtifact = artifactDao.save(slave);			
+		} catch (Exception e) {
+			throw e;
+		}
+		if(newArtifact == null) {
+			throw new Exception("保存零件异常！");
+		} else {
+			artifactDetail.setSlave(newArtifact);
+			try {
+				artifactDetailDao.save(artifactDetail);
+				rslt = 1;
+			} catch (Exception e) {
+				throw e;
+			}			
 		}
 		return rslt;
 	}

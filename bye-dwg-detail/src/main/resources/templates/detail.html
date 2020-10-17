@@ -73,36 +73,54 @@
 		            <form class="form-horizontal" id="frmDetail">
 		                <div class="card-body">
 		                	<div class="form-group row">
-		                    <label for="dlgArtifactCode" class="col-sm-2 col-form-label">图号</label>
-		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control is-warning" id="dlgArtifactCode" name="artifactCode" placeholder="图号">
+		                    <label for="dlgArtifactCode" class="col-sm-3 col-form-label">零件图号</label>
+		                    <div class="col-sm-9">
+		                      <input type="text" class="form-control is-warning" id="dlgArtifactCode" name="artifactCode" placeholder="零件图号">
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
-		                    <label for="dlgArtifactName" class="col-sm-2 col-form-label">名称</label>
-		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgArtifactName" name="artifactName" placeholder="名称" readonly>
+		                    <label for="dlgArtifactName" class="col-sm-3 col-form-label">零件名称</label>
+		                    <div class="col-sm-9">
+		                      <input type="text" class="form-control is-warning" id="dlgArtifactName" name="artifactName" placeholder="零件名称">
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
-		                    <label for="dlgNumber" class="col-sm-2 col-form-label">数量</label>
-		                    <div class="col-sm-10">
-		                      <input type="number" class="form-control is-warning" id="dlgNumber" name="number" placeholder="数量">
+		                    <label for="dlgMaterialCode" class="col-sm-3 col-form-label">材料代码</label>
+		                    <div class="col-sm-9">
+		                      <input type="text" class="form-control" id="dlgMaterialCode" name="materialCode" placeholder="材料代码">
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgMaterialName" class="col-sm-3 col-form-label">材料名称</label>
+		                    <div class="col-sm-9">
+		                      <input type="text" class="form-control" id="dlgMaterialName" name="materialName" placeholder="材料名称">
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgArtifactWeight" class="col-sm-3 col-form-label">零件重量</label>
+		                    <div class="col-sm-9">
+		                      <input type="number" class="form-control" id="dlgArtifactWeight" name="weight" placeholder="零件重量">
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgNumber" class="col-sm-3 col-form-label">需要数量</label>
+		                    <div class="col-sm-9">
+		                      <input type="number" class="form-control is-warning" id="dlgNumber" name="number" placeholder="需要数量">
 		                    </div>
 		                  </div>	                  
 		                  <div class="form-group row">
-		                  	<label for="" class="col-sm-2 col-form-label">分解</label>
-		                    <div class="col-sm-10">
+		                  	<label for="" class="col-sm-3 col-form-label">零件分解</label>
+		                    <div class="col-sm-9">
 		                      <div class="icheck-info">
 		                        <input type="checkbox" class="form-check-input" id="dlgNeedSplit" name="needSplit">
-		                        <label class="form-check-label" for="dlgNeedSplit">需要进一步分拆</label>
+		                        <label class="form-check-label" for="dlgNeedSplit">需要进一步分拆得到下级明细</label>
 		                      </div>
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
-		                    <label for="dlgDetailMemo" class="col-sm-2 col-form-label">备注</label>
-		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgDetailMemo" name="detailMemo" placeholder="备注">
+		                    <label for="dlgDetailMemo" class="col-sm-3 col-form-label">备注信息</label>
+		                    <div class="col-sm-9">
+		                      <input type="text" class="form-control" id="dlgDetailMemo" name="detailMemo" placeholder="备注信息">
 		                    </div>
 		                  </div>
 		                </div>
@@ -161,7 +179,7 @@
 		                  <div class="form-group row">
 		                    <label for="dlgQuota" class="col-sm-2 col-form-label">定额</label>
 		                    <div class="col-sm-10">
-		                      <input type="number" class="form-control" id="dlgQuota" name="quota" placeholder="定额">
+		                      <input type="text" class="form-control" id="dlgQuota" name="quota" placeholder="定额">
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">

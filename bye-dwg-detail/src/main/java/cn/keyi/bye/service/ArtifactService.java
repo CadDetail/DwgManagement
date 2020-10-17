@@ -53,26 +53,18 @@ public class ArtifactService {
 	 * comment: 以分页的方式查询产品（工件）列表
 	 * author : 兴有林栖
 	 * date   : 2020-8-1
+	 * @param artifactCode: 工件图号，允许空
 	 * @param artifactName: 工件名称，允许空
 	 * @param productFlag : 工件类型标识，0-顶层产品，1-普通工件，-1-查询时忽略此参数
-	 * @param canBeSplit  : 是否有明细（可分解）
 	 * @param pageable
 	 * @return
 	 */
-	public Page<Artifact> getArtifactsByPage(String artifactName, Short productFlag, Boolean canBeSplit, Pageable pageable) {
+	public Page<Artifact> getArtifactsByPage(String artifactCode, String artifactName, Short productFlag, Pageable pageable) {
 		if(productFlag == -1) {
-			if(!canBeSplit) {
-				return artifactDao.findByArtifactNameContaining(artifactName, pageable);
-			} else {
-				return artifactDao.findByArtifactNameContainingAndCanBeSplit(artifactName, canBeSplit, pageable);
-			}			
+			return artifactDao.findByArtifactCodeContainingOrArtifactNameContaining(artifactCode, artifactName, pageable);		
 		} else {
-			if(!canBeSplit) {
-				return artifactDao.findByArtifactNameContainingAndProductFlag(artifactName, productFlag, pageable);
-			} else {
-				return artifactDao.findByArtifactNameContainingAndProductFlagAndCanBeSplit(artifactName, productFlag, canBeSplit, pageable);
-			}
-		}			
+			return artifactDao.findByArtifactCodeContainingAndProductFlagOrArtifactNameContainingAndProductFlag(artifactCode, productFlag, artifactName, productFlag, pageable);			
+		}
 	}
 	
 	/**

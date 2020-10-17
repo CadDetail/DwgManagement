@@ -1,7 +1,6 @@
 package cn.keyi.bye.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,50 +43,60 @@ public class ArtifactDetailController {
 	@RequiresPermissions("detail:del")
 	public Object deleteDetail(Long detailId) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		String rslt = artifactDetailService.deleteArtifactDetail(detailId);
-		if(rslt.isEmpty()) {
-			map.put("status", 1);
-			map.put("message", "明细删除成功！");
-		} else {
-			map.put("status", 0);
-			map.put("message", rslt);
+		int rslt = 0;
+		try {
+			rslt = artifactDetailService.deleteArtifactDetail(detailId);
+			if(rslt == 1) {
+				map.put("message", "明细删除成功！");
+			} else {
+				map.put("message", "明细删除失败！");
+			}
+		} catch (Exception e) {
+			map.put("message", e.getMessage());
 		}
+		map.put("status", rslt);
 		return map;	
 	}
 	
 	@RequestMapping("/saveArtifactDetail")
 	@RequiresPermissions(value={"detail:add","detail:edit"},logical=Logical.OR)
 	public Object saveArtifact(HttpServletRequest request) {
-		ArtifactDetail detail = new ArtifactDetail();
-		if(request.getParameter("id") != null) {
-			Long id = Long.valueOf(request.getParameter("id"));
-			detail.setDetailId(id);
+		ArtifactDetail detail = null;		
+		Artifact son = null;
+		String id = request.getParameter("id");
+		if( id == null) {	// 新增模式
+			detail = new ArtifactDetail();			
+			son = new Artifact();			
+			Long parentId = Long.valueOf(request.getParameter("parentId"));
+			Artifact parent = artifactService.getArtifactById(parentId);
+			detail.setMaster(parent);
+		} else {			// 编辑模式
+			Long detailId = Long.parseLong(id);
+			detail = artifactDetailService.getArtifactDetailById(detailId);
+			son = detail.getSlave();
 		}
+		son.setArtifactCode(request.getParameter("artifactCode"));
+		son.setArtifactName(request.getParameter("artifactName"));			
+		son.setMaterialCode(request.getParameter("materialCode"));
+		son.setMaterialName(request.getParameter("materialName"));
+		son.setProductFlag((short) 1);
+		son.setWeight(Float.valueOf(request.getParameter("weight")));
 		detail.setNumber(Integer.valueOf(request.getParameter("number")));
 		detail.setNeedSplit(Boolean.valueOf(request.getParameter("needSplit")));
 		detail.setDetailMemo(request.getParameter("detailMemo"));
-		Long parentId = Long.valueOf(request.getParameter("parentId"));
-		Artifact parent = artifactService.getArtifactById(parentId);
-		String artifactCode = request.getParameter("artifactCode");
-		Artifact son = artifactService.getArtifactByCode(artifactCode);
-		detail.setMaster(parent);
-		detail.setSlave(son);
 		Map<String, Object> map = new HashMap<String, Object>();
-		List<ArtifactDetail> existDetails = artifactDetailService.getDetailByMasterIdAndSlaveId(parentId, son.getArtifactId());
-		// 新增模式下, 先判断明细中是不是此零件已在记录中
-		if(detail.getDetailId() == null && existDetails.size() > 0) {
-			map.put("status", 2);
-			map.put("message", "明细中已经包含此零件！");
-		} else {
-			String rslt = artifactDetailService.saveArtifactDetail(detail);
-			if(rslt.isEmpty()) {
-				map.put("status", 1);
+		int rslt = 0;
+		try {
+			rslt = artifactDetailService.saveArtifactDetail(son, detail);
+			if(rslt == 1) {
 				map.put("message", "明细保存成功！");
 			} else {
-				map.put("status", 0);
-				map.put("message", rslt);
+				map.put("message", "明细保存失败！");
 			}
-		}		
+		} catch (Exception e) {
+			map.put("message", e.getMessage());
+		}
+		map.put("status", rslt);	
 		return map;		
 	}
 
@@ -104,7 +113,7 @@ public class ArtifactDetailController {
 		ArtifactDetail detail = artifactDetailService.getArtifactDetailById(detailId);		
 		detail.setDimension(request.getParameter("dimension"));
 		detail.setUnit(request.getParameter("unit"));
-		detail.setQuota(Float.valueOf(request.getParameter("quota")));
+		detail.setQuota(request.getParameter("quota"));
 		detail.setWorkingSteps(request.getParameter("workingSteps"));
 		detail.setClassificationSign(request.getParameter("classificationSign"));
 		detail.setProcessSign(request.getParameter("processSign"));

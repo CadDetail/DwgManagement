@@ -20,9 +20,11 @@
 					url:  "/artifact/findArtifacts",
 		        	type: "POST",
 		        	data: function(param) {
+		        		param.artifactCode = $("#txtArtifactName").val();
 		        		param.artifactName = $("#txtArtifactName").val();
-		        		param.productFlag = $("#chkOnlyProduct").is(":checked") ? 0 : -1;
-		        		param.canBeSplit = $("#chkCanSplit").is(":checked") ? 0 : -1;
+		        		//param.productFlag = $("#chkOnlyProduct").is(":checked") ? 0 : -1;
+		        		//param.canBeSplit = $("#chkCanSplit").is(":checked") ? 0 : -1;
+		        		param.productFlag = 0;
 		        	}
 		        },
 				columns: [
@@ -30,11 +32,11 @@
 					{ data: null, orderable: false},
 					{ data: 'artifactCode' },
 		            { data: 'artifactName' },
-		            { data: 'productModel' },
+		            { data: 'productModel', orderable: false},
 		            { data: 'materialCode', orderable: false},
 		            { data: 'materialName', orderable: false},
 		            { data: 'weight' },
-		            { data: 'artifactMemo', orderable: false},
+		            //{ data: 'artifactMemo', orderable: false},
 		            { data: null, orderable: false, "render": function(data, type, row, meta) {
 		            	var htmlOpt = "<div class='d-flex justify-content-end'>";
 		            	var permissions = sessionStorage.getItem("permissions");
@@ -89,13 +91,24 @@
 			  });
 			
 			// 查询按钮、复选框事件
-			$("#btnFindArtifacts, #chkOnlyProduct, #chkCanSplit").click(function() {
-				var flag = $("#chkOnlyProduct").is(":checked") ? 0 : -1;
-				var flag2 = $("#chkCanSplit").is(":checked") ? 0 : -1;
+		    //$("#btnFindArtifacts, #chkOnlyProduct, #chkCanSplit").click(function() {
+			//	var flag = $("#chkOnlyProduct").is(":checked") ? 0 : -1;
+			//	var flag2 = $("#chkCanSplit").is(":checked") ? 0 : -1;
+			//	var param = {
+			//		artifactName: $("#txtArtifactName").val(),
+			//		productFlag: flag,
+			//		canBeSplit: flag2
+			//	}
+			//	// 重新加载查询参数并执行查询
+			//	datatable.settings()[0].ajax.data = param;
+			//	//datatable.ajax.reload();
+			//	datatable.draw();
+			//});
+			$("#btnFindArtifacts").click(function() {
 				var param = {
+					artifactCode: $("#txtArtifactName").val(),
 					artifactName: $("#txtArtifactName").val(),
-					productFlag: flag,
-					canBeSplit: flag2
+					productFlag: 0
 				}
 				// 重新加载查询参数并执行查询
 				datatable.settings()[0].ajax.data = param;
@@ -107,9 +120,8 @@
  			$("#btnSaveArtifact").click(function() {
  				var artifactName = $("#dlgArtifactName").val();
  				var artifactCode = $("#dlgArtifactCode").val();
- 				var weight =$("#dlgArtifactWeight").val();
- 				if(artifactName == "" || artifactCode == "" || weight == "") {
- 					myAlert("零件信息输入不完整！")
+ 				if(artifactName == "" || artifactCode == "") {
+ 					myAlert("产品信息输入不完整！")
  					return;
  				}
 				$.ajax({
@@ -123,7 +135,7 @@
 						if(result.status == 1) {
 							$("#modal-artifact").modal("hide");
 							var title = $("#dlgArtifactTitle").html();
-							if(title == "新增工件") {
+							if(title == "添加产品") {
 								// 添加时，跳转到最后一页
 								datatable.page("last").draw("page");
 							} else {
@@ -151,7 +163,7 @@
 		function newArtifact() {
 			saveUrl = "/artifact/saveArtifact";
 			$("#modal-artifact input").val("");
-			$("#dlgArtifactTitle").html("新增工件");
+			$("#dlgArtifactTitle").html("添加产品");
 			$("#modal-artifact").modal("show");
 		}
 		
@@ -163,11 +175,11 @@
 			$("#dlgArtifactWeight").val(artifact.weight);
 			$("#dlgMaterialCode").val(artifact.materialCode);
 			$("#dlgMaterialName").val(artifact.materialName);			
-			$("#dlgArtifactFlag")[0].selectedIndex = artifact.productFlag;
+			//$("#dlgArtifactFlag")[0].selectedIndex = artifact.productFlag;
 			$("#dlgProductModel").val(artifact.productModel);
-			$("#dlgCanSplit").prop("checked", artifact.canBeSplit);
-			$("#dlgArtifactMemo").val(artifact.artifactMemo);
-			$("#dlgArtifactTitle").html("修改工件");
+			//$("#dlgCanSplit").prop("checked", artifact.canBeSplit);
+			//$("#dlgArtifactMemo").val(artifact.artifactMemo);
+			$("#dlgArtifactTitle").html("编辑产品");
 			$("#modal-artifact").modal("show");
 		}
 		

@@ -37,10 +37,7 @@ public class ArtifactController {
 	 * comment: 以分页的方式查询产品（工件）列表
 	 * author : 兴有林栖
 	 * date   : 2020-8-1
-	 * @param artifactName: 工件名称，允许空
-	 * @param productFlag : 工件类型标识，0-顶层产品，1-普通工件，-1-查询时忽略此参数
-	 * @param pageNumber  : 页码
-	 * @param pageSize    : 页大小
+	 * @param request
 	 * @return
 	 */
 	@RequestMapping("/findArtifacts")
@@ -50,15 +47,16 @@ public class ArtifactController {
 		int pageNumber = Integer.parseInt(request.getParameter("start"));	// 记录起始编号
 		int pageSize = Integer.parseInt(request.getParameter("length"));	// 页大小
 		pageNumber = pageSize <= 0 ? 1 : pageNumber / pageSize;				// 计算页码
+		String artifactCode = request.getParameter("artifactName");			// 工件图号
 		String artifactName = request.getParameter("artifactName");			// 工件名称
 		short productFlag = (short) Integer.parseInt(request.getParameter("productFlag"));	// 工件类别
-		Integer canSplit = Integer.parseInt(request.getParameter("canBeSplit"));			// 是否可分解
-		Boolean canBeSplit = canSplit == 0 ? true : false;
+		//Integer canSplit = Integer.parseInt(request.getParameter("canBeSplit"));			// 是否可分解
+		//Boolean canBeSplit = canSplit == 0 ? true : false;
 		String orderColumn = request.getParameter("order[0][column]");		// 排序字段编号
 		String orderDir = request.getParameter("order[0][dir]");			// 排序方式
 		String orderField = request.getParameter("columns["+orderColumn+"][data]");	//排序字段名称，这里要注意与数据库字段一致
 		PageRequest pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.fromString(orderDir), orderField));
-		Page<Artifact> page = artifactService.getArtifactsByPage(artifactName, productFlag, canBeSplit, pageable);
+		Page<Artifact> page = artifactService.getArtifactsByPage(artifactCode, artifactName, productFlag, pageable);
 		// 下面代码为满足DataTable插件要求而进行的组装
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("draw", draw);
@@ -135,11 +133,19 @@ public class ArtifactController {
 		if(canBeSplit != null) {
 			artifact.setCanBeSplit(canBeSplit.equals("on") ? true : false);	
 		} else {
-			artifact.setCanBeSplit(false);
+			artifact.setCanBeSplit(true);
 		}
-		artifact.setProductFlag(Short.valueOf(request.getParameter("productFlag")));
+		String productFlag = request.getParameter("productFlag");
+		if(productFlag != null) {
+			artifact.setProductFlag(Short.valueOf(productFlag));
+		} else {
+			artifact.setProductFlag((short) 0);
+		}		
 		artifact.setProductModel(request.getParameter("productModel"));
-		artifact.setArtifactMemo(request.getParameter("artifactMemo"));
+		String artifactMemo = request.getParameter("artifactMemo");
+		if(artifactMemo != null) {
+			artifact.setArtifactMemo(artifactMemo);
+		}		
 		Map<String, Object> map = new HashMap<String, Object>();
 		String rslt = artifactService.saveArtifact(artifact);
 		if(rslt.isEmpty()) {

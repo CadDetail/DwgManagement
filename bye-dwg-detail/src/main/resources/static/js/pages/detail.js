@@ -125,8 +125,8 @@
 		
 		function newDetail() {
 			saveUrl = "/detail/saveArtifactDetail";
-			$("#dlgArtifactCode").removeAttr("readonly");
-			$("#dlgArtifactCode").addClass("is-warning");
+			//$("#dlgArtifactCode").removeAttr("readonly");
+			//$("#dlgArtifactCode").addClass("is-warning");
 			$("#modal-artifactDetail input").val("");
 			$("#dlgDetailTitle").html("新增明细");
 			$("#modal-artifactDetail").modal("show");
@@ -134,10 +134,13 @@
 		
 		function editDetail(detail) {
 			saveUrl = "/detail/saveArtifactDetail?id=" + detail.detailId;
-			$("#dlgArtifactCode").attr("readonly", true);
-			$("#dlgArtifactCode").removeClass("is-warning");
+			//$("#dlgArtifactCode").attr("readonly", true);
+			//$("#dlgArtifactCode").removeClass("is-warning");
 			$("#dlgArtifactName").val(detail.slave.artifactName);
 			$("#dlgArtifactCode").val(detail.slave.artifactCode);
+			$("#dlgMaterialCode").val(detail.slave.materialCode);
+			$("#dlgMaterialName").val(detail.slave.materialName);
+			$("#dlgArtifactWeight").val(detail.slave.weight);
 			$("#dlgNumber").val(detail.number);
 			$("#dlgNeedSplit").prop("checked", detail.needSplit);
 			$("#dlgDetailMemo").val(detail.detailMemo);
@@ -254,35 +257,40 @@
 				});
 			}
 			// 添加明细时，由用户先输入图号，然后触发查找此零件
-			$("#dlgArtifactCode").change(function() {
-				$("#dlgArtifactName").val("");
-				var code = $(this).val();
-				if(code.trim().length == 0) { return; }
-				$.post("/artifact/findArtifactByCode", {artifactCode: code}, function(data) {
-					if(data.artifactName) {
-						$("#dlgArtifactName").val(data.artifactName);
-					} else {
-						myAlert("图号输入有误！");
-					}
-				}, "json");
-			});
+			//$("#dlgArtifactCode").change(function() {
+			//	$("#dlgArtifactName").val("");
+			//	var code = $(this).val();
+			//	if(code.trim().length == 0) { return; }
+			//	$.post("/artifact/findArtifactByCode", {artifactCode: code}, function(data) {
+			//		if(data.artifactName) {
+			//			$("#dlgArtifactName").val(data.artifactName);
+			//		} else {
+			//			myAlert("图号输入有误！");
+			//		}
+			//	}, "json");
+			//});
 			// 明细保存按钮单击事件, 进行添加或修改明细
  			$("#btnSaveDetail").click(function() {
  				var parentId = $('a[class="nav-link active"][data-toggle="pill"]').attr("id").substring(3);
  				activeTab = parentId;
- 				var artifactName = $("#dlgArtifactName").val();
  				var artifactCode = $("#dlgArtifactCode").val();
+ 				var artifactName = $("#dlgArtifactName").val(); 				
+ 				var materialCode = $("#dlgMaterialCode").val();
+ 				var materialName = $("#dlgMaterialName").val();
+ 				var weight = $("#dlgArtifactWeight").val();
  				var number =$("#dlgNumber").val();
  				var needSplit = $("#dlgNeedSplit").is(":checked") ? true : false;
- 				var detailMemo = $("#detailMemo").val();
- 				if(artifactName == "" || number == "") {
+ 				var detailMemo = $("#dlgDetailMemo").val();
+ 				if(artifactCode =="" || artifactName == "" || number == "") {
  					myAlert("明细数据输入不完整！")
  					return;
  				}
 				$.ajax({
 					type: "POST",
 					url:  saveUrl,
-					data: {parentId: parentId, artifactCode: artifactCode, number: number, needSplit: needSplit, detailMemo: detailMemo},
+					data: { parentId: parentId, artifactCode: artifactCode, artifactName:artifactName,
+							materialCode: materialCode, materialName: materialName, weight: weight, 
+							number: number, needSplit: needSplit, detailMemo: detailMemo },
 					error: function() {
 						myAlert("出错啦！权限不足？");
 					},
