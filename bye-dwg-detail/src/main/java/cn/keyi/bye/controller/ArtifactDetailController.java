@@ -104,7 +104,7 @@ public class ArtifactDetailController {
 		ArtifactDetail detail = artifactDetailService.getArtifactDetailById(detailId);		
 		detail.setDimension(request.getParameter("dimension"));
 		detail.setUnit(request.getParameter("unit"));
-		detail.setQuota(Float.valueOf(request.getParameter("quota")));
+		detail.setQuota(request.getParameter("quota"));
 		detail.setWorkingSteps(request.getParameter("workingSteps"));
 		detail.setClassificationSign(request.getParameter("classificationSign"));
 		detail.setProcessSign(request.getParameter("processSign"));

@@ -2,7 +2,7 @@
 SQLyog Ultimate v12.09 (64 bit)
 MySQL - 5.7.26 : Database - dbcaddetail
 *********************************************************************
-*/
+*/
 
 /*!40101 SET NAMES utf8 */;
 
@@ -50,7 +50,7 @@ CREATE TABLE `artifactdetail` (
   `needSplit` tinyint(1) NOT NULL DEFAULT '0' COMMENT '明细表中的此工件是否需要继续分解（获取其下一级明细）',
   `dimension` varchar(255) DEFAULT NULL COMMENT '参考尺寸（会签）',
   `unit` varchar(255) DEFAULT NULL COMMENT '单位（会签）',
-  `quota` float DEFAULT NULL COMMENT '定额（会签）',
+  `quota` varchar(255) DEFAULT NULL COMMENT '定额（会签）',
   `workingSteps` varchar(255) DEFAULT NULL COMMENT '工序（会签）',
   `classificationSign` varchar(255) DEFAULT NULL COMMENT '分类标识（会签）',
   `processSign` varchar(255) DEFAULT NULL COMMENT '处理标志（会签）',

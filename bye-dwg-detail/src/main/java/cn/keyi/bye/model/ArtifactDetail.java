@@ -33,7 +33,7 @@ public class ArtifactDetail implements Serializable  {
 	private String unit;
 	// 定额（会签）
 	@Column(name = "quota")
-	private Float quota;
+	private String quota;
 	// 工序（会签）
 	@Column(name = "workingSteps")
 	private String workingSteps;
@@ -90,10 +90,10 @@ public class ArtifactDetail implements Serializable  {
 	public void setUnit(String unit) {
 		this.unit = unit;
 	}
-	public Float getQuota() {
+	public String getQuota() {
 		return quota;
 	}
-	public void setQuota(Float quota) {
+	public void setQuota(String quota) {
 		this.quota = quota;
 	}
 	public String getWorkingSteps() {

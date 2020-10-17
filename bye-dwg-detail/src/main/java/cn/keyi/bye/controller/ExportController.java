@@ -104,7 +104,7 @@ public class ExportController {
 				if(dimension != null) { row.getCell(21).setCellValue(dimension); }
 				String unit = details.get(j).getUnit();
 				if(unit != null) { row.getCell(24).setCellValue(unit); }
-				Float quota = details.get(j).getQuota();
+				String quota = details.get(j).getQuota();
 				if(quota != null) { row.getCell(25).setCellValue(quota); }
 				String workingSteps = details.get(j).getWorkingSteps();
 				if(workingSteps != null) { row.getCell(27).setCellValue(workingSteps); }
