@@ -51,7 +51,7 @@
 				}
 				
 				// 激活对应的导航菜单
-				$(".sidebar .nav-link").removeClass("active");
+				$(".sidebar .nav-treeview .nav-link").removeClass("active");
 				var activeMenu = sessionStorage.getItem("activemenu");
 				if(activeMenu != null) {
 					$("#" + activeMenu).addClass("active");

@@ -151,15 +151,17 @@
 			          innerHtml += '            <span>角色：<small class="text-muted" id="lblrole' + item.userId + '">' + rolelist.join("，") + '</small></span>';
 			          innerHtml += '          </p>';			          
 			          innerHtml += '          <div class="d-flex justify-content-end">';
+			          innerHtml += '            <div class="btn-group btn-group-sm">';
 			          if(permissions.indexOf("user:edit") != -1 || permissions.indexOf("user:add") != -1) {
-			          	innerHtml += "            <button type='button' class='btn btn-success btn-sm ml-1' onclick='resetPassword(" + item.userId + ")'><i class='fas fa-key mr-1'></i>密码</button>";
+			          	innerHtml += "            <button type='button' class='btn btn-secondary' onclick='resetPassword(" + item.userId + ")'><i class='fas fa-key mr-1'></i></button>";
 			          }
 			          if(permissions.indexOf("user:edit") != -1) {
-			          	innerHtml += "            <button type='button' class='btn btn-info btn-sm ml-1' onclick='editUser(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt mr-1'></i>修改</button>";
+			          	innerHtml += "            <button type='button' class='btn btn-info' onclick='editUser(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt mr-1'></i></button>";
 			          }
 			          if(permissions.indexOf("user:del") != -1) {
-			          	innerHtml += "            <button type='button' class='btn btn-danger btn-sm ml-1' onclick='deleteUser(" + item.userId + ")'><i class='fas fa-trash mr-1'></i>删除</button>";
+			          	innerHtml += "            <button type='button' class='btn btn-danger' onclick='deleteUser(" + item.userId + ")'><i class='fas fa-trash mr-1'></i></button>";
 			          }
+			          innerHtml += '            </div>';
 			          innerHtml += '          </div>';			          
 			          innerHtml += '        </div>';
 			          innerHtml += '      </div>';

@@ -4,7 +4,7 @@
 	$(document).ready(function() {
 			
 			// 取消活动菜单的反亮显示
-			$(".sidebar .nav-link").removeClass("active");
+			$(".sidebar .nav-treeview .nav-link").removeClass("active");
 			
 			  // The Calender
 			  $('#calendar').datetimepicker({

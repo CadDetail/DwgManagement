@@ -1,10 +1,12 @@
 package cn.keyi.bye.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -76,6 +78,7 @@ public class ArtifactDetailService {
 		List<ArtifactDetail> detail = this.getDetailByMasterId(master.getArtifactId());
 		map.put("detail", detail);
 		map.put("times", times);
+		map.put("weight", 0);
 		recursiveDetail.add(map);
 		for(ArtifactDetail detailItem : detail) {
 			if(detailItem.getNeedSplit()) {
@@ -84,6 +87,61 @@ public class ArtifactDetailService {
 			}			
 		}
 		return;
+	}
+	
+	/**
+	 * comment: 指定一个工件，使用递归方式获取从属于它的所有下级工件，并计算每一个包含下层零件的零件重量，最后组装成一个列表返回
+	 * author : 兴有林栖
+	 * date   : 2020-12-19 
+	 * @param master: 遍历的顶层零件（出发点）
+	 * @param times : 倍数，即层级之间的零件数量倍数
+	 * @return
+	 */
+	public List<Map<String, Object>> getDetailByMaster(Artifact master, int times) {
+		List<Map<String, Object>> details = new ArrayList<Map<String, Object>>();
+		// 先调用递归方法获取某产品的所有明细
+		this.findRecursiveDetailByMaster(master, times, details);
+		// 针对获取的明细，重新计算各具有下级明细的零件的重量
+		for(Map<String, Object> map : details) {
+			Float weight = this.countWeight(((Artifact) map.get("artifact")).getArtifactId(), details);
+			// 四舍五入保留两位小数
+			BigDecimal bgWeight = new BigDecimal(weight).setScale(2, RoundingMode.UP);
+			// 更新程序中的零件的重量
+			Artifact artifact = (Artifact) map.get("artifact");
+			artifact.setWeight(bgWeight.floatValue());
+			map.put("artifact", artifact);
+			map.put("weight", bgWeight.floatValue());
+		}
+		return details;
+	}
+	
+	/**
+	 * comment: 指定一个工件，使用递归方式计算其重量并返回
+	 * author : 兴有林栖
+	 * date   : 2020-12-19 
+	 * @param artifactId: 工件ID
+	 * @param details   : 使用递归方式已经获取到的包括自身和下层零件的列表
+	 * @return
+	 */
+	public Float countWeight(Long artifactId, List<Map<String, Object>> details) {
+		Float weight = (float) 0.0;
+		for(Map<String, Object> map : details) {
+			if(((Artifact) map.get("artifact")).getArtifactId() == artifactId) {
+				@SuppressWarnings("unchecked")
+				List<ArtifactDetail> subDetails = (List<ArtifactDetail>) map.get("detail");
+				for(ArtifactDetail detail : subDetails) {
+					if(detail.getNeedSplit()) {	// 递归方式计算还包含下层零件的零件重量
+						weight = weight + countWeight(detail.getSlave().getArtifactId(), details) * detail.getNumber();
+					} else {	// 累计明细中没有下层零件的零件重量
+						Float tmpWeight = detail.getSlave().getWeight();
+						if(tmpWeight == null) { tmpWeight = (float) 0.0; }
+						weight = weight + tmpWeight * detail.getNumber();
+					}
+				}
+				break;
+			}
+		}
+		return weight;
 	}
 	
 	/**

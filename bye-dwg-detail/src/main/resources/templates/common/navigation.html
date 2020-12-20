@@ -124,36 +124,72 @@
 	                <!-- Sidebar Menu -->
 	                <nav class="mt-2">
 	                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-							<li class="nav-item">
-								<a id="menuuser" class="nav-link" href="javascript:openOtherUrl('user')">
+							
+						  <li class="nav-item has-treeview menu-open">
+				            <a href="#" class="nav-link active">
+				              <i class="nav-icon fas fa-user-secret"></i>
+				              <p>用于与权限<i class="right fas fa-angle-left"></i></p>
+				            </a>
+				            <ul class="nav nav-treeview">
+				              <li class="nav-item">
+				                <a id="menuuser" class="nav-link" href="javascript:openOtherUrl('user')">
 									<i class="nav-icon fas fa-user"></i>
 									<p>用户管理</p>
 								</a>
-							</li>
-							<li class="nav-item">
-								<a id="menurole" class="nav-link" href="javascript:openOtherUrl('role')">
-									<i class="nav-icon fas fa-user-secret"></i>
-									<p>角色管理</p>
+				              </li>
+				              <li class="nav-item">
+				                <a id="menurole" class="nav-link" href="javascript:openOtherUrl('role')">
+									<i class="nav-icon fas fa-street-view"></i>
+									<p>角色配置</p>
 								</a>
-							</li>
-							<li class="nav-item">
-								<a id="menupermission" class="nav-link" href="javascript:openOtherUrl('permission')">
+				              </li>
+				              <li class="nav-item">
+				                <a id="menupermission" class="nav-link" href="javascript:openOtherUrl('permission')">
 									<i class="nav-icon fas fa-key"></i>
-									<p>权限管理</p>
+									<p>权限定义</p>
 								</a>
-							</li>
-							<li class="nav-item">
-								<a id="menuartifact" class="nav-link" href="javascript:openOtherUrl('artifact')">
-									<i class="nav-icon fas fa-database"></i>
+				              </li>
+				            </ul>
+				          </li>
+						  <li class="nav-item has-treeview menu-open">
+				            <a href="#" class="nav-link active">
+				              <i class="nav-icon fas fa-database"></i>
+				              <p>产品及明细<i class="right fas fa-angle-left"></i>
+				              </p>
+				            </a>
+				            <ul class="nav nav-treeview">
+				              <li class="nav-item">
+				                <a id="menuartifact" class="nav-link" href="javascript:openOtherUrl('artifact')">
+									<i class="nav-icon fas fa-cog"></i>
 									<p>产品管理</p>
 								</a>
-							</li>
-							<li class="nav-item">
-								<a id="menuimportdetail" class="nav-link" href="javascript:openOtherUrl('importdetail')">
+				              </li>
+				              <li class="nav-item">
+				                <a id="menuimportdetail" class="nav-link" href="javascript:openOtherUrl('importdetail')">
 									<i class="nav-icon fas fa-upload"></i>
 									<p>明细导入</p>
 								</a>
-							</li>
+				              </li>
+				              <li class="nav-item">
+				                <a id="menumaterialfeature" href="javascript:openOtherUrl('materialfeature')" class="nav-link">
+				                  <i class="nav-icon far fa-bookmark"></i>
+				                  <p>材料特性</p>
+				                </a>
+				              </li>
+				              <li class="nav-item">
+				                <a id="menuworkingsteps" href="javascript:openOtherUrl('workingsteps')" class="nav-link">
+				                  <i class="far fa-circle nav-icon"></i>
+				                  <p>工艺路线</p>
+				                </a>
+				              </li>
+				              <li class="nav-item">
+				                <a id="menuneedsplitprefix" href="javascript:openOtherUrl('needsplitprefix')" class="nav-link">
+				                  <i class="nav-icon far fa-flag"></i>
+				                  <p>图号标签</p>
+				                </a>
+				              </li>
+				            </ul>
+				          </li>
 	                    </ul>
 	                </nav>
 	                <!-- /.sidebar-menu -->

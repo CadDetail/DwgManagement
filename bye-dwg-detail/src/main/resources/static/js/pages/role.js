@@ -102,12 +102,14 @@
 			          
 			          innerHtml += '          <div class="card-body">';
 			          innerHtml += '            <div class="d-flex justify-content-center">';
+			          innerHtml += '              <div class="btn-group btn-group-sm">';
 			          if(permissions.indexOf("role:edit") != -1) {
-			          	innerHtml += "            <button type='button' class='btn btn-info btn-sm ml-1' onclick='editRole(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt'></i></button>";
+			          	innerHtml += "            <button type='button' class='btn btn-info' onclick='editRole(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt'></i></button>";
 			          }
 			          if(permissions.indexOf("role:del") != -1) {
-			          	innerHtml += "            <button type='button' class='btn btn-danger btn-sm ml-1' onclick='deleteRole(" + item.roleId + ")'><i class='fas fa-trash'></i></button>";
+			          	innerHtml += "            <button type='button' class='btn btn-danger' onclick='deleteRole(" + item.roleId + ")'><i class='fas fa-trash'></i></button>";
 			          }
+			          innerHtml += '              </div>';
 			          innerHtml += '            </div>';
 			          innerHtml += '          </div><!-- /.card-footer -->';
 			          

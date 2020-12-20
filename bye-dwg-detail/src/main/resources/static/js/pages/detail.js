@@ -2,6 +2,37 @@
  * 适配于detail.html
  */
 		var saveUrl = "", activeTab = -1, inspectDetailId = -1;
+		var quotaformulas = new Object();
+		
+		// 加载工序
+		function loadWorkingstes() {
+		    $.ajax({
+		        type: 'GET',
+		        url: '/workingsteps/findWorkingsteps',
+		        dataType: 'json',
+		        success: function (result) {
+		            if (result != null) {
+		                var sHtml = '<option value="">请选择</option>'; ;
+		                $.each(result, function (i, val) {
+		                	sHtml += "<option value ='" + val.stepName + "'>" + val.stepName + "</option>";
+		                });
+		                $('#dlgWorkingSteps').html(sHtml);
+		            }
+		        }
+		    });
+		}
+		
+		// 加载材料材质和公式
+		function loadQuotaformula() {
+		    $.ajax({
+		        type: 'GET',
+		        url: '/quotaformula/findQuotaformula/',
+		        dataType: 'json',
+		        success: function (result) {
+		        	quotaformulas = result;		        	
+		        }
+		    });
+		}
 	
 		// 创建info-box
 		function createInfoBox(data) {
@@ -30,9 +61,7 @@
 			html += '      <span class="info-box-icon bg-warning"><i class="far fa-hourglass"></i></span>';
 			html += '      <div class="info-box-content">';
 			html += '        <span class="info-box-text">重量</span>';
-			var weight = data.artifact.weight;
-			if(weight == null) { weight = "未知"; }
-			html += '        <span class="info-box-number">' + weight + '</span>';
+			html += '        <span class="info-box-number">' + data.weight + '</span>';
 			html += '      </div>';
 			html += '    </div>';
 			html += '  </div>';
@@ -50,7 +79,7 @@
 		}
 	
 		// 创建一个表格
-		function createTable(tableId, data) {
+		function createTable(tableId, data, artifacts) {
 			var permissions = sessionStorage.getItem("permissions");
 			var html = '<div class="table-responsive">';
 			html += '<table class="table table-hover table-striped projects" id="' + tableId + '">';
@@ -59,7 +88,8 @@
 			html += '      <th scope="col">#</th>';
 			html += '      <th scope="col">图号</th>';
 			html += '      <th scope="col">名称</th>';
-			html += '      <th scope="col">材料</th>';
+			html += '      <th scope="col">材料代码</th>';
+			html += '      <th scope="col">材料名称</th>';
 			html += '      <th scope="col">重量</th>';
 			html += '      <th scope="col">数量</th>';
 			html += '      <th scope="col">备注</th>';
@@ -69,6 +99,20 @@
 			html += '</thead>';
 			html += '<tbody>';
 			$.each(data, function(i, item) {
+				/*if(item.needSplit) {
+					$.each(artifacts, function(index, element) {
+						if(item.slave.artifactId == element.artifact.artifactId) {
+							if(element.detail.length > 0) {
+								html += '<tr class="table-success" id="tr' + item.detailId + '">';
+							} else {
+								html += '<tr class="table-danger" id="tr' + item.detailId + '">';
+							}
+							return false;
+						}
+					})
+				} else {
+					html += '<tr id="tr' + item.detailId + '">';
+				}*/
 				html += '<tr id="tr' + item.detailId + '">';
 				html += '<th scope="row">' + (i+1) + '</th>';
 				html += '<td>' + item.slave.artifactCode + '</td>';
@@ -80,18 +124,30 @@
 				var materialCode = item.slave.materialCode;
 				if(materialCode == null) { materialCode = ""; }
 				html += '<td>' + materialCode + '</td>';
+				var materialName = item.slave.materialName;
+				if(materialName == null) { materialName = ""; }
+				html += '<td>' + materialName + '</td>';
 				var weight = item.slave.weight;
 				if(weight == null) { weight = ""; };
 				html += '<td>' + weight + '</td>';
 				if(item.number <= 0) {
-					html += '<td><span class="badge bg-danger">' + item.number + '</span></td>';
+					html += '<td><span class="badge bg-warning">' + item.number + '</span></td>';
 				} else {
 					html += '<td>' + item.number + '</td>';
 				}
 				var memo = item.detailMemo;
 				html += '<td>' + (memo == null ? "" : memo) + '</td>';
 				if(item.needSplit) {
-					html += '<td><span class="badge bg-secondary">' + (item.needSplit ? "是" : "否") + '</span></td>';
+					$.each(artifacts, function(index, element) {
+						if(item.slave.artifactId == element.artifact.artifactId) {
+							if(element.detail.length > 0) {
+								html += '<td><span class="badge bg-success">' + (item.needSplit ? "是" : "否") + '</span></td>';
+							} else {
+								html += '<td><span class="badge bg-danger">' + (item.needSplit ? "是" : "否") + '</span></td>';
+							}
+							return false;
+						}
+					})
 				} else {
 					html += '<td>' + (item.needSplit ? "是" : "否") + '</td>';
 				}
@@ -177,23 +233,55 @@
 			$("#dlgInspectArtifactCode").val(detail.slave.artifactCode);
 			$("#dlgInspectArtifactName").val(detail.slave.artifactName);
 			$("#dlgDimension").val(detail.dimension);
-			$("#dlgUnit").val(detail.unit);
-			$("#dlgQuota").val(detail.quota);
-			$("#dlgWorkingSteps").val(detail.workingSteps);
-			$("#dlgClassificationSign").val(detail.classificationSign);
-			$("#dlgProcessSign").val(detail.processSign);
-			var inspector = detail.inspector;
-			if(inspector == null || inspector == "") {
-				inspector = $("#useralias").html();
+			var unit = detail.unit;
+			if(detail.unit == null) {
+				unit = "kg";
 			}
-			$("#dlgInspector").val(inspector);
+			$("#dlgUnit").val(unit);
+			var feature = null, factor = 1.0;			
+			if(quotaformulas != null) {
+				$.each(quotaformulas, function(i, item) {
+					if(item.materialName == detail.slave.materialName) {						
+						feature = item.feature;
+						factor = item.formulaFactor;
+						return false;
+					}
+				});
+			}
+			$("#dlgFeature").val(feature);
+			$("#dlgFactor").val(factor);
+			$("#dlgQuota").val(detail.quota);
+			$("#dlgWorkingSteps").val(detail.workingSteps);			
 			$("#modal-inspect").modal("show");
+		}
+		
+		function calculateQuota() {
+			var dimension = $("#dlgDimension").val();
+			var feature = $("#dlgFeature").val();
+			var factor = $("#dlgFactor").val();
+			dimension = dimension.toLowerCase().replace(/cm/g, "");
+			var operands = dimension.split("*");
+			if(operands.length != 2 && operands.length != 3) {
+				myAlert("尺寸输入格式：长*宽*高（直径*长）");
+				return;
+			}
+			if(feature == null || feature == "") { feature = 0; }
+			var quota = 0;
+			if(operands.length == 2) {		// 圆柱体，结果以公斤为单位
+				quota = (3.14 * (operands[0]/2) * (operands[0]/2) * operands[1]) * feature / factor / 1000;				
+			}			
+			else if(operands.length == 3) {	// 长方体，结果以公斤为单位
+				quota = (operands[0] * operands[1] * operands[2]) * feature / factor / 1000;
+			}			
+			$("#dlgQuota").val(quota.toFixed(2));
+			$("#dlgUnit").val("kg");
 		}
 		
 		function loadData(masterId) {
 			$.ajax({
 				type: "GET",
-				url:  "/artifact/findRecursiveDetail",
+				// url:  "/artifact/findRecursiveDetail",
+				url:  "/artifact/findSubDetails",
 				data: {masterId: masterId},
 				success: function(result) {						
 					var navitem = '<ul class="nav nav-tabs" id="tabDetail" role="tablist">';
@@ -212,7 +300,7 @@
 							content += '<div class="tab-pane fade" id="content' + item.artifact.artifactId + '" role="tabpanel" aria-labelledby="tab' + item.artifact.artifactId + '">';
 						}
 						content += createInfoBox(item);
-						content += createTable('table' + item.artifact.artifactId, item.detail);
+						content += createTable('table' + item.artifact.artifactId, item.detail, result);
 						content += '</div>';							
 					});
 					navitem += '</ul>';
@@ -232,12 +320,16 @@
 			    dataType: "json"
 			});
 		}
-	
+		
 		$(document).ready(function() {
 			var masterId = sessionStorage.getItem("artifactId");
 			if(masterId != null) {
 				// 数据表加载数据
-				loadData(masterId);				
+				loadData(masterId);	
+				// 加载可供选择的工序 
+				loadWorkingstes();
+				// 加载材料材质及公式
+				loadQuotaformula();
 				// 为导出按钮添加事件
 				$('#btnExportDetail').click(function() {
 					var url = "/export/exportDetail?masterId=" + masterId;
@@ -312,14 +404,14 @@
  				var dimension = $("#dlgDimension").val();
  				var unit = $("#dlgUnit").val();
  				var quota =$("#dlgQuota").val();
- 				if(dimension == "" || unit == "" || quota == "") {
+ 				if(dimension == "" || quota == "") {
  					myAlert("会签数据输入不完整！")
  					return;
  				}
 				$.ajax({
 					type: "POST",
 					url:  "/detail/saveArtifactInspect?id=" + inspectDetailId,
-					data: $("#frmInspect").serialize(),
+					data: $("#frmInspect").serialize() + "&" + $.param({inspector:$("#username").html()}),
 					error: function() {
 						myAlert("出错啦！权限不足？");
 					},

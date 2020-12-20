@@ -16,14 +16,17 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.keyi.bye.model.Artifact;
 import cn.keyi.bye.model.ArtifactDetail;
+import cn.keyi.bye.model.CookieUser;
 import cn.keyi.bye.service.ArtifactDetailService;
 import cn.keyi.bye.service.ArtifactService;
 
@@ -44,7 +47,8 @@ public class ExportController {
 		Artifact master = artifactService.getArtifactById(masterId);
 		int times = 1;	// 初始倍数置为1, 即最开始要遍历下级零件的产品看成是1件
 		if(master != null) {			
-			artifactDetailService.findRecursiveDetailByMaster(master, times, listDetail);
+			// artifactDetailService.findRecursiveDetailByMaster(master, times, listDetail);
+			listDetail = artifactDetailService.getDetailByMaster(master, times);
 		}
 		// 处理Excel表格	
 		InputStream xlsFile = this.getClass().getResourceAsStream("/static/files/DetailTemplate.xls");
@@ -73,14 +77,19 @@ public class ExportController {
 			// 共几页
 			cell = sheet.getRow(32).getCell(18);
 			cell.setCellValue(listDetail.size());
+			// 编制（会签人）
+			Subject subject = SecurityUtils.getSubject();
+			CookieUser cookieUser = (CookieUser) subject.getPrincipal();
+			cell = sheet.getRow(30).getCell(26);
+			cell.setCellValue(cookieUser.getUserName());
 			// 具体明细
 			Artifact artifact = (Artifact) listDetail.get(i).get("artifact");
-			Integer numberMulti = (Integer) listDetail.get(i).get("times");
+			//Integer numberMulti = (Integer) listDetail.get(i).get("times");
 			@SuppressWarnings("unchecked")
 			List<ArtifactDetail> details = (List<ArtifactDetail>) listDetail.get(i).get("detail");
 			// 零件名称
 			cell = sheet.getRow(34).getCell(10);
-			cell.setCellValue(artifact.getArtifactName());
+			cell.setCellValue(artifact.getArtifactName());			
 			// 如果明细记录数超过Excel模板文件可容纳的行数，则先插入若干空行
 			if(details.size() > 25) {
 				insertRow(sheet, 10, details.size() - 25);
@@ -91,9 +100,11 @@ public class ExportController {
 				row.getCell(2).setCellValue(details.get(j).getSlave().getArtifactCode());
 				row.getCell(4).setCellValue(details.get(j).getSlave().getArtifactName());				
 				row.getCell(6).setCellValue(details.get(j).getMaster().getArtifactCode());
-				row.getCell(8).setCellValue(details.get(j).getNumber() * numberMulti);
+				//row.getCell(8).setCellValue(details.get(j).getNumber() * numberMulti);
+				row.getCell(8).setCellValue(details.get(j).getNumber());
 				Float weight = details.get(j).getSlave().getWeight();
-				if(weight != null) { row.getCell(9).setCellValue(weight * numberMulti); }
+				// if(weight != null) { row.getCell(9).setCellValue(weight * numberMulti); }
+				if(weight != null) { row.getCell(9).setCellValue(weight); }
 				String materialName = details.get(j).getSlave().getMaterialName();
 				if(materialName != null) { row.getCell(11).setCellValue(materialName); }
 				String materialCode = details.get(j).getSlave().getMaterialCode();

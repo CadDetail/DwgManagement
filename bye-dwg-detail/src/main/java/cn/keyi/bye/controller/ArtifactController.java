@@ -116,6 +116,24 @@ public class ArtifactController {
 		return listDetail;
 	}
 	
+	/***
+	 * comment: 根据给出的工件Id, 以递归的方式获取其下层所有零件，包含重量计算
+	 * author : 兴有林栖
+	 * date   : 2020-12-19 
+	 * @param masterId
+	 * @return
+	 */
+	@RequestMapping("/findSubDetails")
+	public List<Map<String, Object>> findSubDetails(Long masterId) {
+		List<Map<String, Object>> listDetail = new ArrayList<Map<String, Object>>();
+		Artifact master = artifactService.getArtifactById(masterId);
+		int times = 1;	// 初始倍数置为1, 即最开始要遍历下级零件的产品看成是1件
+		if(master != null) {			
+			listDetail = artifactDetailService.getDetailByMaster(master, times);
+		}
+		return listDetail;
+	}
+	
 	@RequestMapping("/saveArtifact")
 	@RequiresPermissions(value={"artifact:add","artifact:edit"},logical=Logical.OR)
 	public Object saveArtifact(HttpServletRequest request) {

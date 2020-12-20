@@ -98,8 +98,11 @@
 		                  </div>
 		                  <div class="form-group row">
 		                    <label for="dlgArtifactWeight" class="col-sm-3 col-form-label">零件重量</label>
-		                    <div class="col-sm-9">
+		                    <div class="input-group col-sm-9">
 		                      <input type="number" class="form-control" id="dlgArtifactWeight" name="weight" placeholder="零件重量">
+		                      <div class="input-group-append">
+			                    <span class="input-group-text">kg</span>
+			                  </div>
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
@@ -167,7 +170,7 @@
 		                  <div class="form-group row">
 		                    <label for="dlgDimension" class="col-sm-2 col-form-label">尺寸</label>
 		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgDimension" name="dimension" placeholder="参考尺寸">
+		                      <input type="text" class="form-control is-warning" id="dlgDimension" name="dimension" placeholder="长cm*宽cm*高cm（直径cm*长cm）">
 		                    </div>
 		                  </div>	                  
 		                  <div class="form-group row">
@@ -177,36 +180,31 @@
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
+		                    <label for="dlgClassificationSign" class="col-sm-2 col-form-label">密度</label>
+		                    <div class="input-group col-sm-10">
+		                      <input type="number" class="form-control" id="dlgFeature" name="feature" placeholder="密度">
+		                      <div class="input-group-append">
+			                    <span class="input-group-text">g/cm^3</span>
+			                  </div>
+			                  <input type="hidden" class="form-control" id="dlgFactor" name="factor">
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
 		                    <label for="dlgQuota" class="col-sm-2 col-form-label">定额</label>
-		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgQuota" name="quota" placeholder="定额">
+		                    <div class="input-group col-sm-10">
+		                      <input type="text" class="form-control is-warning" id="dlgQuota" name="quota" placeholder="定额">
+		                      <span class="input-group-append">
+			                    <button type="button" class="btn btn-info btn-flat" id="btnCalQuota" onclick="calculateQuota()">计&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;算</button>
+			                  </span>
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
 		                    <label for="dlgWorkingSteps" class="col-sm-2 col-form-label">工序</label>
 		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgWorkingSteps" name="workingSteps" placeholder="工序">
+		                      <select class="form-control" id="dlgWorkingSteps"  name="workingSteps">
+		                      </select>
 		                    </div>
-		                  </div>
-		                  <div class="form-group row">
-		                    <label for="dlgClassificationSign" class="col-sm-2 col-form-label">分类</label>
-		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgClassificationSign" name="classificationSign" placeholder="分类标识">
-		                    </div>
-		                  </div>
-		                  <div class="form-group row">
-		                    <label for="dlgProcessSign" class="col-sm-2 col-form-label">处理</label>
-		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgProcessSign" name="processSign" placeholder="处理标识">
-		                    </div>
-		                  </div>
-		                  <div class="form-group row">
-		                    <label for="dlgInspector" class="col-sm-2 col-form-label">会签</label>
-		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control" id="dlgInspector" name="inspector" placeholder="会签人">
-		                    </div>
-		                  </div>
-		                  
+		                  </div>		                  
 		                </div>
 		                <!-- /.card-body -->
 		                <div class="card-footer">

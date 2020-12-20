@@ -115,8 +115,6 @@ public class ArtifactDetailController {
 		detail.setUnit(request.getParameter("unit"));
 		detail.setQuota(request.getParameter("quota"));
 		detail.setWorkingSteps(request.getParameter("workingSteps"));
-		detail.setClassificationSign(request.getParameter("classificationSign"));
-		detail.setProcessSign(request.getParameter("processSign"));
 		detail.setInspector(request.getParameter("inspector"));
 		String rslt = artifactDetailService.saveArtifactDetail(detail);
 		if(rslt.isEmpty()) {
