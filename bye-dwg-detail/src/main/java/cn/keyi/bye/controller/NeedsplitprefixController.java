@@ -16,48 +16,48 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.keyi.bye.model.CookieUser;
-import cn.keyi.bye.model.Workingsteps;
-import cn.keyi.bye.service.WorkingstepsService;
+import cn.keyi.bye.model.Needsplitprefix;
+import cn.keyi.bye.service.NeedsplitprefixService;
 
 @RestController
-@RequestMapping("/workingsteps")
-public class WorkingstepsController {
-
-	@Autowired
-	WorkingstepsService workingstepsService;
+@RequestMapping("/needsplitprefix")
+public class NeedsplitprefixController {
 	
-	@RequestMapping("/findWorkingsteps")
-	@RequiresPermissions(value={"workingsteps:view","detail:check"},logical=Logical.OR)
-	public List<Workingsteps> findWorkingsteps() {
-		return workingstepsService.getAllWorkingsteps();
+	@Autowired
+	NeedsplitprefixService needsplitprefixService;
+	
+	@RequestMapping("/findNeedsplitprefix")
+	@RequiresPermissions("needsplitprefix:view")
+	public List<Needsplitprefix> findNeedsplitprefix() {
+		return needsplitprefixService.getNeedsplitprefixs();
 	}
 	
-	@RequestMapping("/saveWorkingsteps")
+	@RequestMapping("/saveNeedsplitprefix")
 	@RequiresPermissions(value={"workingsteps:add","workingsteps:edit"},logical=Logical.OR)
-	public Object saveWorkingsteps(HttpServletRequest request) {
+	public Object saveNeedsplitprefix(HttpServletRequest request) {
 		Subject subject = SecurityUtils.getSubject();
 		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
-		Workingsteps workingsteps = new Workingsteps();
+		Needsplitprefix needsplitprefix = new Needsplitprefix();
 		if(request.getParameter("id") != null) {
 			Long id = Long.valueOf(request.getParameter("id"));
-			Workingsteps tmp = workingstepsService.getWorkingstepsById(id);
+			Needsplitprefix tmp = needsplitprefixService.getNeedsplitprefixById(id);
 			if(tmp != null) {
-				workingsteps = tmp;
+				needsplitprefix = tmp;
 			} else {
-				workingsteps.setStepId(id);
+				needsplitprefix.setPrefixId(id);
 			}
-			workingsteps.setUpdateBy(cookieUser.getUserName());
-			workingsteps.setUpdateTime(LocalDateTime.now());
+			needsplitprefix.setUpdateBy(cookieUser.getUserName());
+			needsplitprefix.setUpdateTime(LocalDateTime.now());
 		} else {
-			workingsteps.setCreateBy(cookieUser.getUserName());
-			workingsteps.setCreateTime(LocalDateTime.now());
+			needsplitprefix.setCreateBy(cookieUser.getUserName());
+			needsplitprefix.setCreateTime(LocalDateTime.now());
 		}
-		workingsteps.setStepName(request.getParameter("workingstepName"));
+		needsplitprefix.setPrefixLabel(request.getParameter("prefixLabel"));
 		Map<String, Object> map = new HashMap<String, Object>();
-		String rslt = workingstepsService.saveWorkingsteps(workingsteps);
+		String rslt = needsplitprefixService.saveNeedsplitprefix(needsplitprefix);
 		if(rslt.isEmpty()) {
 			map.put("status", 1);
-			map.put("message", "工序保存成功！");
+			map.put("message", "图号标签保存成功！");
 		} else {
 			map.put("status", 0);
 			map.put("message", rslt);
@@ -65,19 +65,19 @@ public class WorkingstepsController {
 		return map;		
 	}
 	
-	@RequestMapping("/deleteWorkingsteps")
+	@RequestMapping("/deleteNeedsplitprefix")
 	@RequiresPermissions("workingsteps:del")
-	public Object deleteWorkingsteps(Long stepId) {
+	public Object deleteNeedsplitprefix(Long prefixId) {
 		Map<String,Object> map = new HashMap<String, Object>();
-		String rslt = workingstepsService.deleteWorkingsteps(stepId);
+		String rslt = needsplitprefixService.deleteNeedsplitprefix(prefixId);
 		if(rslt.isEmpty()) {
 			map.put("status",1);
-			map.put("massage","工序删除成功！");
+			map.put("massage","图号标签删除成功！");
 		} else {
 			map.put("status", 0);
 			map.put("message", rslt);
 		}
 		return map;
 	}
-	
+
 }

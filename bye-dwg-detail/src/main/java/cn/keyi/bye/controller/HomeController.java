@@ -7,6 +7,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.CredentialsException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -123,6 +124,24 @@ public class HomeController {
 	@RequiresPermissions("detail:import")
     public String importdetail() {
         return "importdetail";
+    }
+	
+	@RequestMapping("/materialfeature")
+	@RequiresPermissions("materialfeature:view")
+    public String materialfeature() {
+        return "materialfeature";
+    }
+	
+	@RequestMapping("/workingsteps")
+	@RequiresPermissions(value={"workingsteps:view","detail:check"},logical=Logical.OR)
+    public String workingsteps() {
+        return "workingsteps";
+    }
+	
+	@RequestMapping("/needsplitprefix")
+	@RequiresPermissions("needsplitprefix:view")
+    public String needsplitprefix() {
+        return "needsplitprefix";
     }
 	
 	@RequestMapping("/getCountInfo")

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head th:replace="common/head :: common_head(~{::title}, ~{})">
-    <title>权限管理</title>
+    <title>材料特性</title>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
     <!-- Site wrapper -->
@@ -20,12 +20,12 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>权限列表</h1>
+                            <h1>材料列表</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/index">主页</a></li>
-                                <li class="breadcrumb-item">权限</li>
+                                <li class="breadcrumb-item">材料特性</li>
                             </ol>
                         </div>
                     </div>
@@ -42,11 +42,11 @@
                                     <form>
                                         <div class="form-row align-items-center">
                                             <div class="col-auto">
-                                                <label class="sr-only" for="sysPermissionTitle">权限名称</label>
+                                                <label class="sr-only" for="sysMaterialName">材料名称</label>
                                                 <div class="input-group mb-2">
-                                                    <input type="text" class="form-control" id="sysPermissionTitle" placeholder="请输入权限名称...">
+                                                    <input type="text" class="form-control" id="sysMaterialName" placeholder="请输入材料名称...">
                                                     <div class="input-group-append">
-                                                        <button class="btn btn-info" type="button" id="btnFindPermissions"><i class="fas fa-search"></i>&nbsp;查询</button>
+                                                        <button class="btn btn-info" type="button" id="btnFindMaterial"><i class="fas fa-search"></i>&nbsp;查询</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -56,9 +56,9 @@
 
                                 </div>
                                 <div class="float-right row">
-                                    <div class="col" shiro:hasAnyPermissions="permission:add">
-                                        <button class="btn btn-info" type="button" id="btnNewPermission" onclick="newPermission()">
-                                            <i class="fas fa-key mr-1"></i>添加权限
+                                    <div class="col" shiro:hasAnyPermissions="materialfeature:add">
+                                        <button class="btn btn-info" type="button" id="btnNewMaterialfeature" onclick="newMaterialfeature()">
+                                            <i class="fas fa-bookmark mr-2"></i>添加材料
                                         </button>
                                     </div>
                                     <div id="divButtons" class="mr-2"></div>
@@ -67,14 +67,15 @@
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">
-                            <table id="tablePermissions" class="table table-hover table-striped row-border">
+                            <table id="tableMaterialfeature" class="table table-hover table-striped row-border">
                                 <thead>
                                 <tr>
                                     <th>Id</th>
                                     <th>#</th>
-                                    <th>权限名称</th>
-                                    <th>权限码串</th>
-                                    <th>可用状态</th>
+                                    <th>材料代码</th>
+                                    <th>材料名称</th>
+                                    <th>密度（g/cm^3）</th>
+                                    <th>含损耗定额计算参数</th>
                                     <th></th>
                                 </tr>
                                 </thead>
@@ -89,46 +90,51 @@
             <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
-        <!-- 新建或编辑权限对话框 -->
-        <div class="modal fade" id="modal-permission">
+        <!-- 新建或编辑材料特性对话框 -->
+        <div class="modal fade" id="modal-materialfeature">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title" id="dlgPermissionTitleWnd">管理权限</h4>
+                        <h4 class="modal-title" id="dlgMaterialfeatureTitleWnd">管理材料</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <!-- form start -->
-                    <form class="form-horizontal" id="frmPermission">
+                    <form class="form-horizontal" id="frmMaterialfeature">
                         <div class="card-body">
                             <div class="form-group row">
-                                <label for="dlgPermissionTitle" class="col-sm-2 col-form-label">名称</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control is-warning" id="dlgPermissionTitle" name="permissionTitle" placeholder="权限名称">
+                                <label for="dlgMaterialCode" class="col-sm-3 col-form-label">材料代码</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="dlgMaterialCode" name="materialCode" placeholder="材料代码">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="dlgPermissionCode" class="col-sm-2 col-form-label">码串</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control is-warning" id="dlgPermissionCode" name="permissionCode" placeholder="权限字符串">
+                                <label for="dlgMaterialName" class="col-sm-3 col-form-label">材料名称</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="dlgMaterialName" name="materialName" placeholder="材料名称">
                                 </div>
-                            </div>
+                            </div>                            
                             <div class="form-group row">
-                                <label for="dlgPermissionAvailable" class="col-sm-2 col-form-label">状态</label>
-                                <div class="col-sm-10">
-                                    <select class="form-control" id="dlgPermissionAvailable" name="permissionAvailable">
-                                        <option value ="true" >有效</option>
-                                        <option value ="false">禁用</option>
-                                    </select>
+                                <label for="dlgMaterialFeature" class="col-sm-3 col-form-label">材料密度</label>
+                                <div class="input-group col-sm-9">
+                                    <input type="number" class="form-control" id="dlgMaterialFeature" name="materialFeature" placeholder="材料密度">
+                                    <div class="input-group-append">
+				                      <span class="input-group-text">g/cm^3</span>
+				                    </div>
                                 </div>
                             </div>
-
+							<div class="form-group row">
+                                <label for="dlgFormulaFactor" class="col-sm-3 col-form-label">定额参数</label>
+                                <div class="col-sm-9">
+                                    <input type="number" class="form-control" id="dlgFormulaFactor" name="formulaFactor" placeholder="含损耗定额计算参数">
+                                </div>
+                            </div> 
 
                         </div>
                         <!-- /.card-body -->
                         <div class="card-footer">
-                            <button type="button" class="btn btn-info" id="btnSavePermission">保存</button>
+                            <button type="button" class="btn btn-info" id="btnSaveMaterialfeature">保存</button>
                             <button type="button" class="btn btn-default float-right" data-dismiss="modal">取消</button>
                         </div>
                         <!-- /.card-footer -->
@@ -151,7 +157,7 @@
 	<script type="text/javascript" src="/plugins/datatables/datatables-bs4/js/dataTables.bootstrap4.js"></script>
 	<script type="text/javascript" src="/plugins/datatables/datatables-responsive/js/dataTables.responsive.min.js"></script>
 	<script type="text/javascript" src="/plugins/datatables/datatables-responsive/js/responsive.bootstrap4.min.js"></script>	
-	<!-- permission -->
-	<script type="text/javascript" src="/js/pages/permission.js"></script>	
+	<!-- materialfeature -->
+	<script type="text/javascript" src="/js/pages/materialfeature.js"></script>	
 </body>
 </html>

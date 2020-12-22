@@ -39,18 +39,20 @@
 		            //{ data: 'artifactMemo', orderable: false},
 		            { data: null, orderable: false, "render": function(data, type, row, meta) {
 		            	var htmlOpt = "<div class='d-flex justify-content-end'>";
-		            	var permissions = sessionStorage.getItem("permissions");
-		            	if(permissions.indexOf("detail:view") != -1) {
-			            	if(row.canBeSplit) {
-			            		htmlOpt += "<button type='button' class='btn btn-success btn-sm ml-2' onclick=\"viewDetail('" + row.artifactId + "')\"><i class='fas fa-eye mr-1'></i>明细</button>";
-			            	}
-		            	}
+		            	htmlOpt += "     <div class='btn-group btn-group-sm'>";
+		            	var permissions = sessionStorage.getItem("permissions");		            	
 		            	if(permissions.indexOf("artifact:edit") != -1) {
-		            		htmlOpt += "<button type='button' class='btn btn-info btn-sm ml-2' onclick='editArtifact("   + JSON.stringify(row) + ")'><i class='fas fa-pencil-alt mr-1'></i>编辑</button>";
+		            		htmlOpt += "<button type='button' class='btn btn-info' onclick='editArtifact("   + JSON.stringify(row) + ")'><i class='fas fa-pencil-alt mr-1'></i></button>";
 		            	}
 		            	if(permissions.indexOf("artifact:del") != -1) {
-		            		htmlOpt += "<button type='button' class='btn btn-danger btn-sm ml-2' onclick='deleteArtifact(" + row.artifactId + ")'><i class='fas fa-trash mr-1'></i>删除</button>";
+		            		htmlOpt += "<button type='button' class='btn btn-danger' onclick='deleteArtifact(" + row.artifactId + ")'><i class='fas fa-trash mr-1'></i></button>";
 		            	}
+		            	if(permissions.indexOf("detail:view") != -1) {
+			            	if(row.canBeSplit) {
+			            		htmlOpt += "<button type='button' class='btn btn-success' onclick=\"viewDetail('" + row.artifactId + "')\"><i class='fas fa-eye mr-1'></i></button>";
+			            	}
+		            	}
+		            	htmlOpt += "  </div>";
 		            	htmlOpt += "</div>";
 		            	return htmlOpt;
 		            }}
@@ -129,7 +131,7 @@
 					url:  saveUrl,
 					data: $("#frmArtifact").serialize(),
 					error: function() {
-						myAlert("出错啦！权限不足？");
+						myAlert("出错啦，☹");
 					},
 					success: function(result) {
 						if(result.status == 1) {

@@ -179,7 +179,7 @@
 					url:  saveRoleUrl,
 					data: {roleName: roleName, description: roleAlias, rolePermission: permissionIds.join(",")},
 					error: function() {
-						myAlert("出错啦！权限不足？");
+						myAlert("出错啦，☹");
 					},
 					success: function(result) {
 						if(result.status == 1) {

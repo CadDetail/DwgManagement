@@ -1,7 +1,6 @@
 package cn.keyi.bye.model;
 
 import java.io.Serializable;
-
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -12,16 +11,16 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="workingsteps")
-public class Workingsteps implements Serializable {
-	private static final long serialVersionUID = -5249880411869434260L;
+@Table(name="needsplitprefix")
+public class Needsplitprefix implements Serializable {
+	private static final long serialVersionUID = -5052658152387084058L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "step_id")
-	private Long stepId;
-	// 工序名称
-	@Column(name = "step_name")
-	private String stepName;
+	@Column(name = "prefix_id")
+	private Long prefixId;
+	// 具有下级零件的图号标记
+	@Column(name = "prefix_label")
+	private String prefixLabel;
 	// 创建时间
 	@Column(name = "create_time")
 	private LocalDateTime createTime;
@@ -35,17 +34,17 @@ public class Workingsteps implements Serializable {
 	@Column(name = "update_by")
 	private String updateBy;
 	
-	public Long getStepId() {
-		return stepId;
+	public Long getPrefixId() {
+		return prefixId;
 	}
-	public void setStepId(Long stepId) {
-		this.stepId = stepId;
+	public void setPrefixId(Long prefixId) {
+		this.prefixId = prefixId;
 	}
-	public String getStepName() {
-		return stepName;
+	public String getPrefixLabel() {
+		return prefixLabel;
 	}
-	public void setStepName(String stepName) {
-		this.stepName = stepName;
+	public void setPrefixLabel(String prefixLabel) {
+		this.prefixLabel = prefixLabel;
 	}
 	public LocalDateTime getCreateTime() {
 		return createTime;
@@ -70,5 +69,5 @@ public class Workingsteps implements Serializable {
 	}
 	public void setUpdateBy(String updateBy) {
 		this.updateBy = updateBy;
-	}
+	}	
 }

@@ -1,10 +1,10 @@
 /**
- * 适配于permission.html
+ * 适配于materialfeature.html
  */
         var saveUrl = "";
         $(document).ready(function() {
             // 对数据表格进行初始化
-            var datatable = $('#tablePermissions').DataTable({
+            var datatable = $('#tableMaterialfeature').DataTable({
                 responsive: true,
                 processing: true,
                 serverSide: true,
@@ -16,30 +16,29 @@
                     url: '/plugins/datatables/datatables-bs4/language-zh.json'
                 },
                 ajax: {
-                    url:  "/permissionInfo/findSysPermissions",
+                    url:  "/materialfeature/findMaterialFeatures",
                     type: "POST",
                     data: function(param) {
-                        param.permissionTitle = $("#sysPermissionTitle").val();
+                        param.materialName = $("#sysMaterialName").val();
 
                     }
                 },
                 columns: [
-                    { data: 'permissionId', visible: false},
+                    { data: 'formulaId', visible: false},
                     { data: null, orderable: false},
-                    { data: 'permissionTitle' },
-                    { data: 'permissionCode' },
-                    { data: 'permissionAvailable', "render": function(data) {
-                    	return data ? "<span class='badge bg-success'>有效</span>" : "<span class='badge bg-secondary'>禁用</span>";
-                    }},
+                    { data: 'materialCode' },
+                    { data: 'materialName' },
+                    { data: 'feature' },
+                    { data: 'formulaFactor' },                    
                     { data: null, orderable: false, "render": function(row, meta) {
                             var htmlOpt = "<div class='d-flex justify-content-end'>";
                             htmlOpt += "     <div class='btn-group btn-group-sm'>";
                             var permissions = sessionStorage.getItem("permissions");
-                            if(permissions.indexOf("permission:edit") != -1) {
-                                htmlOpt += "<button type='button' class='btn btn-info' onclick='editPermission(" + JSON.stringify(row) + ")'><i class='fas fa-pencil-alt mr-1'></i></button>";
+                            if(permissions.indexOf("materialfeature:edit") != -1) {
+                                htmlOpt += "<button type='button' class='btn btn-info' onclick='editMaterialfeature(" + JSON.stringify(row) + ")'><i class='fas fa-pencil-alt mr-1'></i></button>";
                             }
-                            if(permissions.indexOf("permission:del") != -1) {
-                                htmlOpt += "<button type='button' class='btn btn-danger' onclick='deletePermission(" + row.permissionId + ")'><i class='fas fa-trash mr-1'></i></button>";
+                            if(permissions.indexOf("materialfeature:del") != -1) {
+                                htmlOpt += "<button type='button' class='btn btn-danger' onclick='deleteMaterialfeature(" + row.formulaId + ")'><i class='fas fa-trash mr-1'></i></button>";
                             }
                             htmlOpt += "  </div>";
                             htmlOpt += "</div>";
@@ -57,10 +56,10 @@
             });
 
 
-            // 查询按钮、复选框事件
-            $("#btnFindPermissions").click(function() {
+            // 查询按钮事件
+            $("#btnFindMaterial").click(function() {
                  var param = {
-                     permissionTitle: $("#sysPermissionTitle").val()
+                	materialName: $("#sysMaterialName").val()
                  }
                 // 重新加载查询参数并执行查询
                 datatable.settings()[0].ajax.data = param;
@@ -69,26 +68,27 @@
             });
 
             // 保存按钮单击事件
-            $("#btnSavePermission").click(function() {
-                var permissionTitle = $("#dlgPermissionTitle").val();
-                var permissionCode = $("#dlgPermissionCode").val();
-                var permissionAvailable = $("#dlgPermissionAvailable").val();
-                if(permissionTitle == "" || permissionCode == "" || permissionAvailable == "") {
-                    myAlert("权限信息输入不完整！")
+            $("#btnSaveMaterialfeature").click(function() {
+                var materialCode = $("#dlgMaterialCode").val();
+                var materialName = $("#dlgMaterialName").val();
+                var feature = $("#dlgMaterialFeature").val();
+                var formulaFactor = $("#dlgFormulaFactor").val();
+                if(materialName == "" || feature == "" || formulaFactor == "") {
+                    myAlert("材料信息输入不完整！")
                     return;
                 }
                 $.ajax({
                     type: "POST",
                     url:  saveUrl,
-                    data: $("#frmPermission").serialize(),
+                    data: $("#frmMaterialfeature").serialize(),
                     error: function() {
                         myAlert("出错啦，☹");
                     },
                     success: function(result) {
                         if(result.status == 1) {
-                            $("#modal-permission").modal("hide");
-                            var title = $("#dlgPermissionTitleWnd").html();
-                            if(title == "新增权限") {
+                            $("#modal-materialfeature").modal("hide");
+                            var title = $("#dlgMaterialfeatureTitleWnd").html();
+                            if(title == "新增材料") {
                                 // 添加时，跳转到最后一页
                                 datatable.page("last").draw("page");
                             } else {
@@ -106,26 +106,27 @@
 
         });
 
-        // 添加一个新权限
-        function newPermission() {
-            saveUrl = "/permissionInfo/saveSysPermission";
-            $("#modal-permission input").val("");
-            $("#dlgPermissionTitleWnd").html("新增权限");
-            $("#modal-permission").modal("show");
+        // 添加一个新材料及特性
+        function newMaterialfeature() {
+            saveUrl = "/materialfeature/saveMaterialFeature";
+            $("#modal-materialfeature input").val("");
+            $("#dlgMaterialfeatureTitleWnd").html("新增材料");
+            $("#modal-materialfeature").modal("show");
         }
 
-        // 编辑（修改）权限
-        function editPermission(permission) {
-             saveUrl = "/permissionInfo/saveSysPermission?id=" + permission.permissionId;
-            $("#dlgPermissionTitle").val(permission.permissionTitle);
-            $("#dlgPermissionCode").val(permission.permissionCode);
-            $("#dlgPermissionAvailable").prop("checked", permission.permissionAvailable);
-            $("#dlgPermissionTitleWnd").html("编辑权限");
-            $("#modal-permission").modal("show");
+        // 编辑（修改）材料及特性
+        function editMaterialfeature(quotaformula) {
+             saveUrl = "/materialfeature/saveMaterialFeature?id=" + quotaformula.formulaId;
+            $("#dlgMaterialCode").val(quotaformula.materialCode);
+            $("#dlgMaterialName").val(quotaformula.materialName);
+            $("#dlgMaterialFeature").val(quotaformula.feature);
+            $("#dlgFormulaFactor").val(quotaformula.formulaFactor);
+            $("#dlgMaterialfeatureTitleWnd").html("编辑材料");
+            $("#modal-materialfeature").modal("show");
         }
 
-        // 删除权限
-        function deletePermission(permissionId) {
+        // 删除材料
+        function deleteMaterialfeature(formulaId) {
             Swal.fire({
                 title: '确定吗？',
                 text: "一旦删除，数据将不可恢复！",
@@ -137,10 +138,10 @@
                 cancelButtonText: '取消'
             }).then((result) => {
                 if (result.value) {
-                    $.post("/permissionInfo/deleteSysPermission", {permissionId: permissionId}, function(data){
+                    $.post("/materialfeature/deleteMaterialFeature", {formulaId: formulaId}, function(data){
                         if(data.status == 1) {
                             // 重新加载数据, 但是保持原来的分页参数
-                            var datatable = $('#tablePermissions').DataTable();
+                            var datatable = $('#tableMaterialfeature').DataTable();
                             datatable.ajax.reload(null, false);
                         } else {
                             Swal.fire('失败！', data.message, 'error');

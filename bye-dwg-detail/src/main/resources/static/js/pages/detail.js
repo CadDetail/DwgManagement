@@ -151,21 +151,23 @@
 				} else {
 					html += '<td>' + (item.needSplit ? "是" : "否") + '</td>';
 				}
-				html += '<td class="project-actions text-right">';				
+				html += '<td class="project-actions text-right">';
+				html += '  <div class="btn-group btn-group-sm">';
             	if(permissions.indexOf("detail:edit") != -1) {
-					html += "<button type='button' class='btn btn-info btn-sm ml-2' onclick='editDetail(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt mr-1'></i>编辑</button>";
+					html += "<button type='button' class='btn btn-info' onclick='editDetail(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt mr-1'></i></button>";
             	}
             	if(permissions.indexOf("detail:del") != -1) {
-					html += '<button type="button" class="btn btn-danger btn-sm ml-2" onclick="deleteDetail(' + item.detailId + ')"><i class="fas fa-trash mr-1"></i>删除</button>';
+					html += '<button type="button" class="btn btn-danger" onclick="deleteDetail(' + item.detailId + ')"><i class="fas fa-trash mr-1"></i></button>';
             	}
             	if(permissions.indexOf("detail:check") != -1) {
             		var inspector = item.inspector;
             		if(inspector != null && inspector != "") {
-            			html += "<button type='button' class='btn btn-secondary btn-sm ml-2' onclick='doInspect(" + JSON.stringify(item) + ")'><i class='fas fa-paw mr-1'></i>会签</button>";
+            			html += "<button type='button' class='btn btn-secondary' onclick='doInspect(" + JSON.stringify(item) + ")'><i class='fas fa-paw mr-1'></i></button>";
             		} else {
-            			html += "<button type='button' class='btn btn-success   btn-sm ml-2' onclick='doInspect(" + JSON.stringify(item) + ")'><i class='fas fa-paw mr-1'></i>会签</button>";
+            			html += "<button type='button' class='btn btn-success' onclick='doInspect(" + JSON.stringify(item) + ")'><i class='fas fa-paw mr-1'></i></button>";
             		}					
             	}
+            	html += '  </tr>';
             	html += '</td>';
 				html += '</tr>';
 			});
@@ -384,7 +386,7 @@
 							materialCode: materialCode, materialName: materialName, weight: weight, 
 							number: number, needSplit: needSplit, detailMemo: detailMemo },
 					error: function() {
-						myAlert("出错啦！权限不足？");
+						myAlert("出错啦，☹");
 					},
 					success: function(result) {	
 						if(result.status == 1) {
@@ -413,7 +415,7 @@
 					url:  "/detail/saveArtifactInspect?id=" + inspectDetailId,
 					data: $("#frmInspect").serialize() + "&" + $.param({inspector:$("#username").html()}),
 					error: function() {
-						myAlert("出错啦！权限不足？");
+						myAlert("出错啦，☹");
 					},
 					success: function(result) {	
 						if(result.status == 1) {

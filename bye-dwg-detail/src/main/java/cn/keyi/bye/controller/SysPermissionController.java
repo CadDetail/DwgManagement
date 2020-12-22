@@ -49,7 +49,7 @@ public class SysPermissionController {
 		int pageSize = Integer.parseInt(request.getParameter("length"));		// 页大小
 		pageNumber = pageSize <= 0 ? 1 : pageNumber / pageSize;					// 计算页码
 		String sysPermissionTitle = request.getParameter("permissionTitle");	// 权限名称
-		if (sysPermissionTitle==null) sysPermissionTitle="";
+		if (sysPermissionTitle == null) sysPermissionTitle = "";
 		String orderColumn = request.getParameter("order[0][column]");			// 排序字段编号
 		String orderDir = request.getParameter("order[0][dir]");				// 排序方式
 		String orderField = request.getParameter("columns["+orderColumn+"][data]");	//排序字段名称，这里要注意与数据库字段一致
