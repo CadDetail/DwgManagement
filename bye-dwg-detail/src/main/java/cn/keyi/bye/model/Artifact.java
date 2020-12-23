@@ -1,6 +1,7 @@
 package cn.keyi.bye.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -48,6 +49,18 @@ public class Artifact  implements Serializable {
 	// 备注
 	@Column(name = "artifactMemo")
 	private String artifactMemo;
+	// 创建时间
+	@Column(name = "create_time")
+	private LocalDateTime createTime;
+	// 创建人
+	@Column(name = "create_by")
+	private String createBy;
+	// 修改时间
+	@Column(name = "update_time")
+	private LocalDateTime updateTime;
+	// 修改人
+	@Column(name = "update_by")
+	private String updateBy;
 	// 明细中的下级零件
 	@OneToMany(mappedBy = "master")
 	@JsonIgnore
@@ -116,6 +129,30 @@ public class Artifact  implements Serializable {
 	}
 	public void setArtifactMemo(String artifactMemo) {
 		this.artifactMemo = artifactMemo;
+	}
+	public LocalDateTime getCreateTime() {
+		return createTime;
+	}
+	public void setCreateTime(LocalDateTime createTime) {
+		this.createTime = createTime;
+	}
+	public String getCreateBy() {
+		return createBy;
+	}
+	public void setCreateBy(String createBy) {
+		this.createBy = createBy;
+	}
+	public LocalDateTime getUpdateTime() {
+		return updateTime;
+	}
+	public void setUpdateTime(LocalDateTime updateTime) {
+		this.updateTime = updateTime;
+	}
+	public String getUpdateBy() {
+		return updateBy;
+	}
+	public void setUpdateBy(String updateBy) {
+		this.updateBy = updateBy;
 	}
 	public List<ArtifactDetail> getSubDetail() {
 		return subDetail;

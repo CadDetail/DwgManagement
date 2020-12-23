@@ -21,6 +21,9 @@ public class Needsplitprefix implements Serializable {
 	// 具有下级零件的图号标记
 	@Column(name = "prefix_label")
 	private String prefixLabel;
+	// 是否为产品的图号标记
+	@Column(name = "prefix_product")
+	private Boolean prefixProduct = Boolean.FALSE;
 	// 创建时间
 	@Column(name = "create_time")
 	private LocalDateTime createTime;
@@ -45,6 +48,12 @@ public class Needsplitprefix implements Serializable {
 	}
 	public void setPrefixLabel(String prefixLabel) {
 		this.prefixLabel = prefixLabel;
+	}
+	public Boolean getPrefixProduct() {
+		return prefixProduct;
+	}
+	public void setPrefixProduct(Boolean prefixProduct) {
+		this.prefixProduct = prefixProduct;
 	}
 	public LocalDateTime getCreateTime() {
 		return createTime;

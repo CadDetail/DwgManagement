@@ -26,7 +26,7 @@
 		function loadQuotaformula() {
 		    $.ajax({
 		        type: 'GET',
-		        url: '/quotaformula/findQuotaformula/',
+		        url: '/materialfeature/findQuotaformula/',
 		        dataType: 'json',
 		        success: function (result) {
 		        	quotaformulas = result;		        	
@@ -40,7 +40,7 @@
 			html += '<div class="row" style="margin-top:10px;">';
 			html += '  <div class="col-md-3 col-sm-6 col-12">';
 			html += '    <div class="info-box h-100">';
-			html += '      <span class="info-box-icon bg-info"><i class="far fa-bookmark"></i></span>';
+			html += '      <span class="info-box-icon bg-info"><i class="icon ion-flag"></i></span>';
 			html += '      <div class="info-box-content text-truncate">';
 			html += '        <span class="info-box-text">图号</span>';
 			html += '        <span class="info-box-number">' + data.artifact.artifactCode + '</span>';
@@ -49,7 +49,7 @@
 			html += '  </div>';
 			html += '  <div class="col-md-3 col-sm-6 col-12">';
 			html += '    <div class="info-box h-100">';
-			html += '      <span class="info-box-icon bg-success"><i class="ion ion-ios-gear-outline"></i></span>';
+			html += '      <span class="info-box-icon bg-success"><i class="icon ion-gear-a"></i></span>';
 			html += '      <div class="info-box-content text-truncate">';
 			html += '        <span class="info-box-text">名称</span>';
 			html += '        <span class="info-box-number">' + data.artifact.artifactName + '</span>';
@@ -58,7 +58,7 @@
 			html += '  </div>';
 			html += '  <div class="col-md-3 col-sm-6 col-12">';
 			html += '    <div class="info-box h-100">';
-			html += '      <span class="info-box-icon bg-warning"><i class="far fa-hourglass"></i></span>';
+			html += '      <span class="info-box-icon bg-warning"><i class="icon ion-speedometer"></i></span>';
 			html += '      <div class="info-box-content">';
 			html += '        <span class="info-box-text">重量</span>';
 			html += '        <span class="info-box-number">' + data.weight + '</span>';
@@ -67,7 +67,7 @@
 			html += '  </div>';
 			html += '  <div class="col-md-3 col-sm-6 col-12">';
 			html += '    <div class="info-box h-100">';
-			html += '      <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>';
+			html += '      <span class="info-box-icon bg-danger"><i class="icon ion-star"></i></span>';
 			html += '      <div class="info-box-content">';
 			html += '        <span class="info-box-text">倍乘</span>';
 			html += '        <span class="info-box-number">' + data.times + '</span>';
@@ -242,7 +242,7 @@
 			$("#dlgUnit").val(unit);
 			var feature = null, factor = 1.0;			
 			if(quotaformulas != null) {
-				$.each(quotaformulas, function(i, item) {
+				$.each(quotaformulas, function(i, item) {					
 					if(item.materialName == detail.slave.materialName) {						
 						feature = item.feature;
 						factor = item.formulaFactor;

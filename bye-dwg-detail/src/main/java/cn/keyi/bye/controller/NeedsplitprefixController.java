@@ -53,6 +53,7 @@ public class NeedsplitprefixController {
 			needsplitprefix.setCreateTime(LocalDateTime.now());
 		}
 		needsplitprefix.setPrefixLabel(request.getParameter("prefixLabel"));
+		needsplitprefix.setPrefixProduct(Boolean.valueOf(request.getParameter("prefixProduct")));
 		Map<String, Object> map = new HashMap<String, Object>();
 		String rslt = needsplitprefixService.saveNeedsplitprefix(needsplitprefix);
 		if(rslt.isEmpty()) {

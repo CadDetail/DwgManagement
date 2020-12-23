@@ -35,18 +35,18 @@
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
-                	<div class="alert alert-info alert-dismissible">
+                	<div class="alert alert-secondary alert-dismissible">
 						<h5><i class="icon fas fa-info"></i> 说明</h5>
 		                                        组件标签管理功能用于实现确定具有什么样的前缀的图号表示其具有下一层的子零件！
 		            </div>
-                    <div class="card card-secondary card-outline">
+                    <div class="card card-info card-outline">
                         <div class="card-header">
                             <div class="clearfix">
                                 <div class="float-left">
                                 </div>
                                 <div class="float-right row">
                                     <div class="col" shiro:hasAnyPermissions="needsplitprefix:add">
-                                        <button class="btn btn-secondary" type="button" id="btnNewNeedsplitprefix" onclick="newNeedsplitprefix()">
+                                        <button class="btn btn-info" type="button" id="btnNewNeedsplitprefix" onclick="newNeedsplitprefix()">
                                             <i class="fas fa-flag mr-2"></i>添加标签
                                         </button>
                                     </div>
@@ -87,6 +87,15 @@
                                     <input type="text" class="form-control" id="dlgPrefixLabel" name="prefixLabel" placeholder="组件标签">
                                 </div>
                             </div> 
+                            <div class="form-group row">
+                                <label for="dlgPrefixProduct" class="col-sm-3 col-form-label">组件类型</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="dlgPrefixProduct" name="prefixProduct">                                        
+                                        <option value ="false">零件</option>
+                                        <option value ="true" >产品</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <!-- /.card-body -->
                         <div class="card-footer">

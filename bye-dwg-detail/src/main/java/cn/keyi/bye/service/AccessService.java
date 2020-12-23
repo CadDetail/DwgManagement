@@ -6,20 +6,25 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.keyi.bye.dao.ArtifactDao;
 import cn.keyi.bye.dao.ArtifactDetailDao;
+import cn.keyi.bye.dao.NeedsplitprefixDao;
 import cn.keyi.bye.model.Artifact;
 import cn.keyi.bye.model.ArtifactDetail;
+import cn.keyi.bye.model.CookieUser;
 
 @Service
 public class AccessService {
@@ -28,9 +33,19 @@ public class AccessService {
 	ArtifactDao artifactDao;
 	@Autowired
 	ArtifactDetailDao artifactDetailDao;
+	@Autowired
+	NeedsplitprefixDao needsplitprefixDao;
 	
-	// 从Access文件中获取零件列表
-	public List<Artifact> getArtifacts(String mdbFileName) {
+	/**
+	 * comment: 从Access文件中获取零件列表
+	 * author : 兴有林栖
+	 * date   : 2020-12-23 
+	 * @param mdbFileName   : Access文件名
+	 * @param productPrefix : 产品图号前缀集合
+	 * @param partPrefix    : 组件图号前缀集合
+	 * @return
+	 */
+	public List<Artifact> getArtifacts(String mdbFileName, HashSet<String> productPrefix, HashSet<String> partPrefix) {
 		List<Artifact> artifacts = new ArrayList<Artifact>();			
 		try {
 			// 这个驱动的地址不要改
@@ -39,15 +54,15 @@ public class AccessService {
 			try {
 				conn = DriverManager.getConnection("jdbc:ucanaccess://" + mdbFileName);
 				Statement stmt = conn.createStatement();
-				HashSet<String> parentCodes = new HashSet<String>();
-				HashSet<String> sonCodes = new HashSet<String>();
-				ResultSet rsDetail = stmt.executeQuery("Select ssdhao, thao From MXSHUJU");
-				while(rsDetail.next()) {
-					parentCodes.add(rsDetail.getNString("ssdhao"));
-					String thao = rsDetail.getNString("thao");
-					if(thao == null || thao.isEmpty()) { continue; }
-					sonCodes.add(thao);
-				}
+				//HashSet<String> parentCodes = new HashSet<String>();
+				//HashSet<String> sonCodes = new HashSet<String>();
+				//ResultSet rsDetail = stmt.executeQuery("Select ssdhao, thao From MXSHUJU");
+				//while(rsDetail.next()) {
+				//	parentCodes.add(rsDetail.getNString("ssdhao"));
+				//	String thao = rsDetail.getNString("thao");
+				//	if(thao == null || thao.isEmpty()) { continue; }
+				//	sonCodes.add(thao);
+				//}				
 				ResultSet rsArtifact = stmt.executeQuery("Select * From MXBTL");
 				while(rsArtifact.next()) {
 					Artifact artifact = new Artifact();
@@ -64,18 +79,35 @@ public class AccessService {
 						artifact.setWeight(null);
 					}
 					// 在明细表中的所属代号（ssdhao）列能找到此零件的图号，说明它拥有下级零件，否则没有
-					if(parentCodes.contains(artifactCode)) {
-						artifact.setCanBeSplit(true);
-					} else {
-						artifact.setCanBeSplit(false);
+					//if(parentCodes.contains(artifactCode)) {
+					//	artifact.setCanBeSplit(true);
+					//} else {
+					//	artifact.setCanBeSplit(false);
+					//}
+					// 如果图号的前缀在产品图号标签列表中, 则表示其是可拆分的零件且是产品(0表示产品)
+					// 如果图号的前缀在组件图号标签列表中, 则表示其是可拆分的零件
+					artifact.setCanBeSplit(false);
+					artifact.setProductFlag((short) 1);
+					for(String prefix : productPrefix) {
+						if(artifactCode.startsWith(prefix)) {
+							artifact.setCanBeSplit(true);
+							artifact.setProductFlag((short) 0);
+							break;
+						}
+					}
+					for(String prefix : partPrefix) {
+						if(artifactCode.startsWith(prefix)) {
+							artifact.setCanBeSplit(true);
+							break;
+						}
 					}
 					// 在明细表中的所属代号（ssdhao）列能找到此零件的图号，但是在图号（thao）列找不到此零件的图号，
 					// 说明此零件是顶层拆分的零件，认定其为“产品”级的工件
-					if(parentCodes.contains(artifactCode) && !sonCodes.contains(artifactCode)) {
-						artifact.setProductFlag((short) 0);
-					} else {
-						artifact.setProductFlag((short) 1);
-					}
+					//if(parentCodes.contains(artifactCode) && !sonCodes.contains(artifactCode)) {
+					//	artifact.setProductFlag((short) 0);
+					//} else {
+					//	artifact.setProductFlag((short) 1);
+					//}
 					artifacts.add(artifact);
 				}
 				stmt.close();
@@ -91,8 +123,15 @@ public class AccessService {
 		return artifacts;
 	}
 	
-	// 从Access文件中获取明细记录，以Map方式组织成列表
-	public List<Map<String, Object>> getArtifactDetail(String mdbFileName) {
+	/**
+	 * comment: 从Access文件中获取明细记录，以 Map 方式组织成列表
+	 * author : 兴有林栖
+	 * date   : 2020-12-23 
+	 * @param mdbFileName : Access文件名
+	 * @param partPrefix  : 组件（具有下层零件）图号前缀集合
+	 * @return
+	 */
+	public List<Map<String, Object>> getArtifactDetail(String mdbFileName, HashSet<String> partPrefix) {
 		List<Map<String, Object>> detailList = new ArrayList<Map<String, Object>>();			
 		try {
 			// 这个驱动的地址不要改
@@ -101,12 +140,12 @@ public class AccessService {
 			try {
 				conn = DriverManager.getConnection("jdbc:ucanaccess://" + mdbFileName);
 				Statement stmt = conn.createStatement();
-				HashSet<String> parentCodes = new HashSet<String>();
-				ResultSet rsDetail = stmt.executeQuery("Select ssdhao From MXSHUJU");
-				while(rsDetail.next()) {
-					parentCodes.add(rsDetail.getNString("ssdhao"));
-				}
-				rsDetail = stmt.executeQuery("Select * From MXSHUJU");
+				//HashSet<String> parentCodes = new HashSet<String>();
+				//ResultSet rsDetail = stmt.executeQuery("Select ssdhao From MXSHUJU");
+				//while(rsDetail.next()) {
+				//	parentCodes.add(rsDetail.getNString("ssdhao"));
+				//}			
+				ResultSet rsDetail = stmt.executeQuery("Select * From MXSHUJU");
 				while(rsDetail.next()) {
 					Map<String, Object> detail = new HashMap<String, Object>();
 					String parentCode = rsDetail.getNString("ssdhao");
@@ -133,10 +172,18 @@ public class AccessService {
 						detail.put("number", 0);	// 读出的内容如果不是数字字符串, 则用0代替
 					}					
 					// 在明细表中的所属代号（ssdhao）列能找到此零件的图号，说明它拥有下级零件，否则没有
-					if(parentCodes.contains(sonCode)) {
-						detail.put("needSplit", true);						
-					} else {
-						detail.put("needSplit", false);
+					//if(parentCodes.contains(sonCode)) {
+					//	detail.put("needSplit", true);						
+					//} else {
+					//	detail.put("needSplit", false);
+					//}
+					// 如果零件图号的前缀在组件标签列表中, 则说明此零件是组件需要进一步分拆
+					detail.put("needSplit", false);
+					for(String prefix : partPrefix) {
+						if(sonCode.startsWith(prefix)) {
+							detail.put("needSplit", true);
+							break;
+						}
 					}
 					// 如果图号（thao）为空或者库中不存在，需要将明细中的有关记录插入到artifact表中，此时需要零件名称和材料代码等信息
 					detail.put("artifactName", artifactName);
@@ -163,8 +210,15 @@ public class AccessService {
 		return detailList;
 	}	
 	
-	// 遍历从Access文件中获取明细记录，检查图号（thao）对应的零件在库中是否已经存在，如果不存在，则先将其插入到artifact表中
-	public int traversingArtifactDetail(List<Map<String, Object>> detailList) {
+	/**
+	 * comment: 遍历从Access文件中获取明细记录，检查图号（thao）对应的零件在库中是否已经存在，如果不存在，则先将其插入到artifact表中
+	 * author : 兴有林栖
+	 * date   : 2020-12-23 
+	 * @param detailList    : Access文件中获取明细记录
+	 * @param productPrefix : 产品图号前缀集合
+	 * @return
+	 */
+	public int traversingArtifactDetail(List<Map<String, Object>> detailList, HashSet<String> productPrefix) {
 		int rslt = 0;
 		try {
 			for(Map<String, Object> map : detailList) {
@@ -183,7 +237,13 @@ public class AccessService {
 					artifact.setArtifactName(artifactName);
 					artifact.setWeight(Float.valueOf(map.get("weight").toString()));
 					artifact.setMaterialCode(materialCode);
-					artifact.setProductFlag((short) 1); 
+					artifact.setProductFlag((short) 1);
+					for(String prefix : productPrefix) {
+						if(artifactCode.startsWith(prefix)) {
+							artifact.setProductFlag((short) 0);
+							break;
+						}
+					}
 					// 如果 needSplit 值为 true，则表明其可拆分，其它情况默认为不可拆分
 					artifact.setCanBeSplit((Boolean) map.get("needSplit"));	
 					artifactDao.save(artifact);
@@ -198,14 +258,24 @@ public class AccessService {
 	
 	
 
-	// 批量插入零件, 忽略冲突零件
+	/**
+	 * comment: 批量插入零件, 忽略冲突零件
+	 * author : 兴有林栖
+	 * date   : 2020-12-23 
+	 * @param artifacts : 待插入到库中的零件
+	 * @return
+	 */
 	@Transactional(rollbackFor = Exception.class)
 	public int insertArtifactsIgnoringConflicts(List<Artifact> artifacts) {
 		int rslt = 0;
+		Subject subject = SecurityUtils.getSubject();
+		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
 		try {
 			for(Artifact artifact: artifacts) {
 				List<Artifact> existArtifacts = artifactDao.findByArtifactCode(artifact.getArtifactCode());
 				if(existArtifacts.size() == 0) {
+					artifact.setCreateTime(LocalDateTime.now());
+					artifact.setCreateBy(cookieUser.getUserName());
 					artifactDao.save(artifact);
 				}
 			}
@@ -216,10 +286,18 @@ public class AccessService {
 		return rslt;
 	}
 	
-	// 批量插入零件, 覆盖库中零件
+	/**
+	 * comment: 批量插入零件, 覆盖库中零件
+	 * author : 兴有林栖
+	 * date   : 2020-12-23 
+	 * @param artifacts : 待插入到库中的零件
+	 * @return
+	 */
 	@Transactional(rollbackFor = Exception.class)
 	public int insertArtifactsCoveringConflicts(List<Artifact> artifacts) {
 		int rslt = 0;
+		Subject subject = SecurityUtils.getSubject();
+		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
 		try {
 			for(Artifact artifact: artifacts) {
 				List<Artifact> existArtifacts = artifactDao.findByArtifactCode(artifact.getArtifactCode());
@@ -233,8 +311,12 @@ public class AccessService {
 					oldArtifact.setProductModel(artifact.getProductModel());
 					oldArtifact.setCanBeSplit(artifact.getCanBeSplit());
 					oldArtifact.setArtifactMemo(artifact.getArtifactMemo());
+					oldArtifact.setUpdateTime(artifact.getUpdateTime());
+					oldArtifact.setUpdateBy(artifact.getUpdateBy());
 					artifactDao.save(oldArtifact);
 				} else {
+					artifact.setCreateTime(LocalDateTime.now());
+					artifact.setCreateBy(cookieUser.getUserName());
 					artifactDao.save(artifact);
 				}
 			}
@@ -249,6 +331,8 @@ public class AccessService {
 	@Transactional(rollbackFor = Exception.class)
 	public int insertDetailIgnoringConflicts(List<Map<String, Object>> detailList) {
 		int rslt = 0;
+		Subject subject = SecurityUtils.getSubject();
+		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
 		try {
 			for(Map<String, Object> detail: detailList) {
 				String masterCode = (String) detail.get("parentCode");
@@ -279,6 +363,8 @@ public class AccessService {
 					artifactDetail.setNumber((Integer) detail.get("number"));
 					artifactDetail.setNeedSplit((Boolean) detail.get("needSplit"));
 					artifactDetail.setDetailMemo((String) detail.get("detailMemo"));
+					artifactDetail.setCreateBy(cookieUser.getUserName());
+					artifactDetail.setCreateTime(LocalDateTime.now());
 					artifactDetailDao.save(artifactDetail);
 				}
 			}
@@ -293,6 +379,8 @@ public class AccessService {
 	@Transactional(rollbackFor = Exception.class)
 	public int insertDetailCoveringConflicts(List<Map<String, Object>> detailList) {
 		int rslt = 0;
+		Subject subject = SecurityUtils.getSubject();
+		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
 		try {
 			for(Map<String, Object> detail: detailList) {
 				String masterCode = (String) detail.get("parentCode");
@@ -320,9 +408,13 @@ public class AccessService {
 					}
 					if(slaves.size() > 0) {
 						artifactDetail.setSlave(slaves.get(0));
-					}					
+					}
+					artifactDetail.setCreateBy(cookieUser.getUserName());
+					artifactDetail.setCreateTime(LocalDateTime.now());
 				} else {
 					artifactDetail = existDetailList.get(0);
+					artifactDetail.setUpdateBy(cookieUser.getUserName());
+					artifactDetail.setUpdateTime(LocalDateTime.now());
 				}
 				artifactDetail.setNumber((Integer) detail.get("number"));
 				artifactDetail.setNeedSplit((Boolean) detail.get("needSplit"));
@@ -336,15 +428,25 @@ public class AccessService {
 		return rslt;
 	}
 	
-	// 批量导入零件和明细
+	/**
+	 * comment: 批量导入零件和明细
+	 * author : 兴有林栖
+	 * date   : 2020-12-23 
+	 * @param artifacts		: 待导入的零件列表
+	 * @param details		: 待导入的明细列表
+	 * @param mode			: 导入模式，忽略或覆盖
+	 * @param productPrefix	: 产品图号前缀集合
+	 * @return
+	 * @throws Exception
+	 */
 	@Transactional(rollbackFor = Exception.class)
-	public int batchImportArtifactDetail(List<Artifact> artifacts, List<Map<String, Object>> details, int mode) throws Exception {
+	public int batchImportArtifactDetail(List<Artifact> artifacts, List<Map<String, Object>> details, int mode, HashSet<String> productPrefix) throws Exception {
 		int rslt = 0;		
 		// mode: 1-忽略冲突零件; 2-覆盖库中零件
 		int artifactOk = (mode == 1) ? insertArtifactsIgnoringConflicts(artifacts) : insertArtifactsCoveringConflicts(artifacts);
 		if(artifactOk == 1) {				
 			// 先遍历明细记录, 检查是否有些零件先预先插入到 artifact 表中
-			int traversed = traversingArtifactDetail(details);
+			int traversed = traversingArtifactDetail(details, productPrefix);
 			if(traversed == 1) {				
 				int detailOk = (mode == 1) ? insertDetailIgnoringConflicts(details) : insertDetailCoveringConflicts(details);
 				if(detailOk == 1) {

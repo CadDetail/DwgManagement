@@ -7,8 +7,9 @@
             // 保存按钮单击事件
             $("#btnSaveNeedsplitprefix").click(function() {
                 var prefixLabel = $("#dlgPrefixLabel").val();
-                if(prefixLabel == "") {
-                    myAlert("组件标签输入不完整！")
+                var prefixProduct = $("#dlgPrefixProduct").val();
+                if(prefixLabel == "" || prefixProduct == "") {
+                    myAlert("信息输入不完整！")
                     return;
                 }
                 $.ajax({
@@ -44,13 +45,22 @@
                 	$.each(result, function (i, item) {
                 		html += '<div class="col-sm-4 col-lg-2">';
                 		html += '  <!-- small card -->';
-                		html += '  <div class="small-box ' + colorlist[i % 6] + '">';
+                		if(item.prefixProduct) {
+                			html += '  <div class="small-box bg-success">';
+                		} else {
+                			html += '  <div class="small-box bg-info">';
+                		}
+                		// html += '  <div class="small-box ' + colorlist[i % 6] + '">';
                 		html += '    <div class="inner">';
                 		html += '      <h4>' + (i+1) + '</h4>';
                 		html += '      <p>' + item.prefixLabel + '</p>';
                 		html += '    </div>';
                 		html += '    <div class="icon">';
-                		html += '      <i class="ion ion-flag"></i>';
+                		if(item.prefixProduct) {
+                			html += '      <i class="ion ion-toggle-filled"></i>';
+                		} else {
+                			html += '      <i class="ion ion-toggle"></i>';
+                		}
                 		html += '    </div>';
                 		if(permissions.indexOf("workingsteps:del") != -1) {
 	                		html += '    <a href="#" class="small-box-footer" onclick="deleteNeedsplitprefix(' + item.prefixId + ')">';

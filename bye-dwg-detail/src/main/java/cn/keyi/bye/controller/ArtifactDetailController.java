@@ -1,18 +1,22 @@
 package cn.keyi.bye.controller;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.keyi.bye.model.Artifact;
 import cn.keyi.bye.model.ArtifactDetail;
+import cn.keyi.bye.model.CookieUser;
 import cn.keyi.bye.service.ArtifactDetailService;
 import cn.keyi.bye.service.ArtifactService;
 
@@ -63,6 +67,8 @@ public class ArtifactDetailController {
 	public Object saveArtifact(HttpServletRequest request) {
 		ArtifactDetail detail = null;		
 		Artifact son = null;
+		Subject subject = SecurityUtils.getSubject();
+		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
 		String id = request.getParameter("id");
 		if( id == null) {	// 新增模式
 			detail = new ArtifactDetail();			
@@ -70,10 +76,14 @@ public class ArtifactDetailController {
 			Long parentId = Long.valueOf(request.getParameter("parentId"));
 			Artifact parent = artifactService.getArtifactById(parentId);
 			detail.setMaster(parent);
+			detail.setCreateBy(cookieUser.getUserName());
+			detail.setCreateTime(LocalDateTime.now());
 		} else {			// 编辑模式
 			Long detailId = Long.parseLong(id);
 			detail = artifactDetailService.getArtifactDetailById(detailId);
 			son = detail.getSlave();
+			detail.setUpdateBy(cookieUser.getUserName());
+			detail.setUpdateTime(LocalDateTime.now());
 		}
 		son.setArtifactCode(request.getParameter("artifactCode"));
 		son.setArtifactName(request.getParameter("artifactName"));			

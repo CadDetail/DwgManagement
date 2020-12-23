@@ -1,14 +1,18 @@
 package cn.keyi.bye.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,9 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.keyi.bye.model.Artifact;
 import cn.keyi.bye.model.ArtifactDetail;
+import cn.keyi.bye.model.CookieUser;
+import cn.keyi.bye.model.Needsplitprefix;
 import cn.keyi.bye.service.AccessService;
 import cn.keyi.bye.service.ArtifactDetailService;
 import cn.keyi.bye.service.ArtifactService;
+import cn.keyi.bye.service.NeedsplitprefixService;
 
 @RestController
 @RequestMapping("/artifact")
@@ -32,6 +39,8 @@ public class ArtifactController {
 	ArtifactDetailService artifactDetailService;
 	@Autowired
 	AccessService accessService;
+	@Autowired
+	NeedsplitprefixService needsplitprefixService;
 	
 	/**
 	 * comment: 以分页的方式查询产品（工件）列表
@@ -137,10 +146,22 @@ public class ArtifactController {
 	@RequestMapping("/saveArtifact")
 	@RequiresPermissions(value={"artifact:add","artifact:edit"},logical=Logical.OR)
 	public Object saveArtifact(HttpServletRequest request) {
+		Subject subject = SecurityUtils.getSubject();
+		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
 		Artifact artifact = new Artifact();
 		if(request.getParameter("id") != null) {
 			Long id = Long.valueOf(request.getParameter("id"));
-			artifact.setArtifactId(id);
+			Artifact tmp = artifactService.getArtifactById(id);
+			if(tmp != null) {
+				artifact = tmp;
+			} else {
+				artifact.setArtifactId(id);
+			}
+			artifact.setUpdateBy(cookieUser.getUserName());
+			artifact.setUpdateTime(LocalDateTime.now());
+		} else {
+			artifact.setCreateBy(cookieUser.getUserName());
+			artifact.setCreateTime(LocalDateTime.now());
 		}
 		artifact.setArtifactName(request.getParameter("artifactName"));
 		artifact.setArtifactCode(request.getParameter("artifactCode"));
@@ -199,9 +220,26 @@ public class ArtifactController {
 		Map<String, Object> map = new HashMap<String, Object>();
 		int rslt = 0;
 		try {
-			List<Artifact> artifacts = accessService.getArtifacts(mdbPhysicalFile);
-			List<Map<String, Object>> details = accessService.getArtifactDetail(mdbPhysicalFile);
-			rslt = accessService.batchImportArtifactDetail(artifacts, details, mode);			
+			// 获取组件的图号前缀标签, 并区分是顶层产品还是普通组件
+			HashSet<String> productPrefix = new HashSet<String>();
+			HashSet<String> partPrefix = new HashSet<String>();
+			List<Needsplitprefix> prefixList = needsplitprefixService.getNeedsplitprefixs();
+			for(Needsplitprefix prefix : prefixList) {
+				if(prefix.getPrefixProduct()) {
+					productPrefix.add(prefix.getPrefixLabel());
+				} else {
+					partPrefix.add(prefix.getPrefixLabel());
+				}
+			}
+			// 从Access文件中获取 MXBTL 表中存放的零件列表
+			List<Artifact> artifacts = accessService.getArtifacts(mdbPhysicalFile, productPrefix, partPrefix);
+			HashSet<String> needSplitPrefix = new HashSet<String>();
+			needSplitPrefix.clear();
+			needSplitPrefix.addAll(productPrefix);
+			needSplitPrefix.addAll(partPrefix);
+			// 从Access文件中获取 MXSHUJU 表中存放的明细列表
+			List<Map<String, Object>> details = accessService.getArtifactDetail(mdbPhysicalFile, needSplitPrefix);
+			rslt = accessService.batchImportArtifactDetail(artifacts, details, mode, productPrefix);			
 			if(rslt == 1) {
 				map.put("message", "明细数据导入成功！");
 			} else {
