@@ -27,13 +27,13 @@ public class WorkingstepsController {
 	WorkingstepsService workingstepsService;
 	
 	@RequestMapping("/findWorkingsteps")
-	@RequiresPermissions(value={"workingsteps:view","detail:check"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","workingsteps:view","detail:check"},logical=Logical.OR)
 	public List<Workingsteps> findWorkingsteps() {
 		return workingstepsService.getAllWorkingsteps();
 	}
 	
 	@RequestMapping("/saveWorkingsteps")
-	@RequiresPermissions(value={"workingsteps:add","workingsteps:edit"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","workingsteps:add","workingsteps:edit"},logical=Logical.OR)
 	public Object saveWorkingsteps(HttpServletRequest request) {
 		Subject subject = SecurityUtils.getSubject();
 		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
@@ -66,7 +66,7 @@ public class WorkingstepsController {
 	}
 	
 	@RequestMapping("/deleteWorkingsteps")
-	@RequiresPermissions("workingsteps:del")
+	@RequiresPermissions(value={"system:all","workingsteps:del"},logical=Logical.OR)
 	public Object deleteWorkingsteps(Long stepId) {
 		Map<String,Object> map = new HashMap<String, Object>();
 		String rslt = workingstepsService.deleteWorkingsteps(stepId);

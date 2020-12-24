@@ -27,7 +27,7 @@ public class SysPermissionController {
 	SysPermissionService sysPermissionService;
 	
 	@RequestMapping("/getPermissionsForSelect2")
-	@RequiresPermissions(value={"role:view","permission:view"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","role:view","permission:view"},logical=Logical.OR)
 	public Object getPermissionsForSelect2() {		
 		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
 		List<SysPermission> permissionList = sysPermissionService.findAll();
@@ -42,7 +42,7 @@ public class SysPermissionController {
 	
 	// 查找权限
 	@RequestMapping("/findSysPermissions")
-	@RequiresPermissions("permission:view")
+	@RequiresPermissions(value={"system:all","permission:view"},logical=Logical.OR)
 	public Object findSysPermissions(HttpServletRequest request) {
 		int draw = Integer.parseInt(request.getParameter("draw"));				// DataTable 要求要返回的参数
 		int pageNumber = Integer.parseInt(request.getParameter("start"));		// 记录起始编号
@@ -66,7 +66,7 @@ public class SysPermissionController {
 
 	// 保存权限
 	@RequestMapping("/saveSysPermission")
-	@RequiresPermissions(value={"permission:add","permission:edit"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","permission:add","permission:edit"},logical=Logical.OR)
 	public Object saveSysPermission(HttpServletRequest request) {
 		SysPermission sysPermission = new SysPermission();
 		if(request.getParameter("id") != null) {
@@ -90,7 +90,7 @@ public class SysPermissionController {
 	
 	// 删除权限
 	@RequestMapping("/deleteSysPermission")
-	@RequiresPermissions("permission:del")
+	@RequiresPermissions(value={"system:all","permission:del"},logical=Logical.OR)
 	public Object deleteSysPermission(Long permissionId) {
 		Map<String,Object> map = new HashMap<String, Object>();
 		String rslt = sysPermissionService.deleteSysPermission(permissionId);

@@ -153,13 +153,13 @@
 				}
 				html += '<td class="project-actions text-right">';
 				html += '  <div class="btn-group btn-group-sm">';
-            	if(permissions.indexOf("detail:edit") != -1) {
+            	if(permissions.indexOf("system:all") != -1 || permissions.indexOf("detail:edit") != -1) {
 					html += "<button type='button' class='btn btn-info' onclick='editDetail(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt mr-1'></i></button>";
             	}
-            	if(permissions.indexOf("detail:del") != -1) {
+            	if(permissions.indexOf("system:all") != -1 || permissions.indexOf("detail:del") != -1) {
 					html += '<button type="button" class="btn btn-danger" onclick="deleteDetail(' + item.detailId + ')"><i class="fas fa-trash mr-1"></i></button>';
             	}
-            	if(permissions.indexOf("detail:check") != -1) {
+            	if(permissions.indexOf("system:all") != -1 || permissions.indexOf("detail:check") != -1) {
             		var inspector = item.inspector;
             		if(inspector != null && inspector != "") {
             			html += "<button type='button' class='btn btn-secondary' onclick='doInspect(" + JSON.stringify(item) + ")'><i class='fas fa-paw mr-1'></i></button>";

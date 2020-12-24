@@ -19,7 +19,7 @@ public class Needsplitprefix implements Serializable {
 	@Column(name = "prefix_id")
 	private Long prefixId;
 	// 具有下级零件的图号标记
-	@Column(name = "prefix_label")
+	@Column(unique = true, name = "prefix_label")
 	private String prefixLabel;
 	// 是否为产品的图号标记
 	@Column(name = "prefix_product")

@@ -37,6 +37,80 @@ public class AccessService {
 	NeedsplitprefixDao needsplitprefixDao;
 	
 	/**
+	 * comment: 判断明细中所属图号对应的组件是否在Access明细表中或在数据库中
+	 * author : 兴有林栖
+	 * date   : 2020-12-24 
+	 * @param masterCodes : 需要判断的所属图号
+	 * @param slaveCodes  : Access文件MXSHUJU表中的图号
+	 * @param productPrefix : 用于标识需要剔除的产品图号，即产品图号不需要事先导入
+	 * @return : 返回不在表中或库中的所属图号
+	 */
+	public List<String> getUnfoundArtifactCodes(List<String> masterCodes, List<String> slaveCodes, HashSet<String> productPrefix) {
+		List<String> rsltList = new ArrayList<String>();
+		// 首先从数据库中查询已存在的零件
+		List<Artifact> artifactList = artifactDao.findByArtifactCodeIn(masterCodes);
+		// 将库中存在的零件图号加入到 slaveCodes 列表中
+		for(Artifact artifact : artifactList) {
+			slaveCodes.add(artifact.getArtifactCode());
+		}
+		// 判断masterCodes列表中哪些所属图号不在slaveCodes列表中，如果不在，则说明所属图号对应的组件事先未导入
+		// 此时，应该警告导入用户需要先在库中或Access明细文件中添加所属图号对应的组件
+		for(String masterCode : masterCodes) {
+			boolean isProduct = false;
+			for(String prefix : productPrefix) {
+				if(masterCode.startsWith(prefix)) {
+					isProduct = true;
+					break;
+				}
+			}
+			if(isProduct) { continue; }
+			if(!slaveCodes.contains(masterCode)) {
+				rsltList.add(masterCode);
+			}
+		}
+		return rsltList;
+	}
+	
+	/**
+	 * comment: 从Access文件的 MXSHUJU 表中获取明细的所属图号和图号
+	 * author : 兴有林栖
+	 * date   : 2020-12-24 
+	 * @param mdbFileName : Access文件
+	 * @param masterCodes : 存放明细中的所属图号（ssdhao）
+	 * @param slaveCodes  : 存放明细中的图号（thao）
+	 * @return
+	 */
+	public int getMasterAndSlaveCodes(String mdbFileName, HashSet<String> masterCodes, HashSet<String> slaveCodes) {
+		int rslt = 0;
+		try {
+			// 这个驱动的地址不要改
+			Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+			Connection conn;
+			try {
+				conn = DriverManager.getConnection("jdbc:ucanaccess://" + mdbFileName);
+				Statement stmt = conn.createStatement();
+				masterCodes.clear();
+				slaveCodes.clear();
+				ResultSet rsDetail = stmt.executeQuery("Select ssdhao, thao From MXSHUJU");
+				while(rsDetail.next()) {
+					masterCodes.add(rsDetail.getNString("ssdhao"));
+					String thao = rsDetail.getNString("thao");
+					if(thao == null || thao.isEmpty()) { continue; }
+					slaveCodes.add(thao);
+				}
+				rslt = 1;
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}					
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		return rslt;
+	}
+	
+	/**
 	 * comment: 从Access文件中获取零件列表
 	 * author : 兴有林栖
 	 * date   : 2020-12-23 

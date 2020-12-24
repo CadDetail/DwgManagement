@@ -35,10 +35,10 @@
                             var htmlOpt = "<div class='d-flex justify-content-end'>";
                             htmlOpt += "     <div class='btn-group btn-group-sm'>";
                             var permissions = sessionStorage.getItem("permissions");
-                            if(permissions.indexOf("permission:edit") != -1) {
+                            if(permissions.indexOf("system:all") != -1 || permissions.indexOf("permission:edit") != -1) {
                                 htmlOpt += "<button type='button' class='btn btn-info' onclick='editPermission(" + JSON.stringify(row) + ")'><i class='fas fa-pencil-alt mr-1'></i></button>";
                             }
-                            if(permissions.indexOf("permission:del") != -1) {
+                            if(permissions.indexOf("system:all") != -1 || permissions.indexOf("permission:del") != -1) {
                                 htmlOpt += "<button type='button' class='btn btn-danger' onclick='deletePermission(" + row.permissionId + ")'><i class='fas fa-trash mr-1'></i></button>";
                             }
                             htmlOpt += "  </div>";

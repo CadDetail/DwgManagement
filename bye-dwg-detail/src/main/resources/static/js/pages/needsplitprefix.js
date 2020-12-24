@@ -62,7 +62,7 @@
                 			html += '      <i class="ion ion-toggle"></i>';
                 		}
                 		html += '    </div>';
-                		if(permissions.indexOf("workingsteps:del") != -1) {
+                		if(permissions.indexOf("system:all") != -1 || permissions.indexOf("workingsteps:del") != -1) {
 	                		html += '    <a href="#" class="small-box-footer" onclick="deleteNeedsplitprefix(' + item.prefixId + ')">';
 	                		html += '      删除 ';
 	                		html += '    </a>';

@@ -35,7 +35,7 @@ public class QuotaformulaController {
 	}
 	
 	@RequestMapping("/findMaterialFeatures")
-	@RequiresPermissions("materialfeature:view")
+	@RequiresPermissions(value={"system:all","materialfeature:view"},logical=Logical.OR)
 	public Object findMaterialFeatures(HttpServletRequest request) {
 		int draw = Integer.parseInt(request.getParameter("draw"));				// DataTable 要求要返回的参数
 		int pageNumber = Integer.parseInt(request.getParameter("start"));		// 记录起始编号
@@ -58,7 +58,7 @@ public class QuotaformulaController {
 	}
 	
 	@RequestMapping("/saveMaterialFeature")
-	@RequiresPermissions(value={"materialfeature:add","materialfeature:edit"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","materialfeature:add","materialfeature:edit"},logical=Logical.OR)
 	public Object saveMaterialFeature(HttpServletRequest request) {
 		Subject subject = SecurityUtils.getSubject();
 		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
@@ -94,7 +94,7 @@ public class QuotaformulaController {
 	}
 	
 	@RequestMapping("/deleteMaterialFeature")
-	@RequiresPermissions("materialfeature:del")
+	@RequiresPermissions(value={"system:all","materialfeature:del"},logical=Logical.OR)
 	public Object deleteMaterialFeature(Long formulaId) {
 		Map<String,Object> map = new HashMap<String, Object>();
 		String rslt = quotaformulaService.deleteMaterialFeature(formulaId);

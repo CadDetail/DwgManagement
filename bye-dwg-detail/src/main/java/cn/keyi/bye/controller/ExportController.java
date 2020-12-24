@@ -40,7 +40,7 @@ public class ExportController {
 	ArtifactDetailService artifactDetailService;
 	
 	@RequestMapping("/exportDetail")
-	@RequiresPermissions(value={"detail:export","detail:print"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","detail:export","detail:print"},logical=Logical.OR)
 	public void exportDetail(Long masterId, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// 先获取到明细列表
 		List<Map<String, Object>> listDetail = new ArrayList<Map<String, Object>>();

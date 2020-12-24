@@ -41,13 +41,13 @@
 		            	var htmlOpt = "<div class='d-flex justify-content-end'>";
 		            	htmlOpt += "     <div class='btn-group btn-group-sm'>";
 		            	var permissions = sessionStorage.getItem("permissions");		            	
-		            	if(permissions.indexOf("artifact:edit") != -1) {
+		            	if(permissions.indexOf("system:all") != -1 || permissions.indexOf("artifact:edit") != -1) {
 		            		htmlOpt += "<button type='button' class='btn btn-info' onclick='editArtifact("   + JSON.stringify(row) + ")'><i class='fas fa-pencil-alt mr-1'></i></button>";
 		            	}
-		            	if(permissions.indexOf("artifact:del") != -1) {
+		            	if(permissions.indexOf("system:all") != -1 || permissions.indexOf("artifact:del") != -1) {
 		            		htmlOpt += "<button type='button' class='btn btn-danger' onclick='deleteArtifact(" + row.artifactId + ")'><i class='fas fa-trash mr-1'></i></button>";
 		            	}
-		            	if(permissions.indexOf("detail:view") != -1) {
+		            	if(permissions.indexOf("system:all") != -1 || permissions.indexOf("detail:view") != -1) {
 			            	if(row.canBeSplit) {
 			            		htmlOpt += "<button type='button' class='btn btn-success' onclick=\"viewDetail('" + row.artifactId + "')\"><i class='fas fa-eye mr-1'></i></button>";
 			            	}

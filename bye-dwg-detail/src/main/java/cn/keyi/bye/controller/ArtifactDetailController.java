@@ -44,7 +44,7 @@ public class ArtifactDetailController {
 	}
 	
 	@RequestMapping("/deleteDetail")
-	@RequiresPermissions("detail:del")
+	@RequiresPermissions(value={"system:all","detail:del"},logical=Logical.OR)
 	public Object deleteDetail(Long detailId) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		int rslt = 0;
@@ -63,7 +63,7 @@ public class ArtifactDetailController {
 	}
 	
 	@RequestMapping("/saveArtifactDetail")
-	@RequiresPermissions(value={"detail:add","detail:edit"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","detail:add","detail:edit"},logical=Logical.OR)
 	public Object saveArtifact(HttpServletRequest request) {
 		ArtifactDetail detail = null;		
 		Artifact son = null;
@@ -111,7 +111,7 @@ public class ArtifactDetailController {
 	}
 
 	@RequestMapping("/saveArtifactInspect")
-	@RequiresPermissions("detail:check")
+	@RequiresPermissions(value={"system:all","detail:check"},logical=Logical.OR)
 	public Object saveArtifactInspect(HttpServletRequest request) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		if(request.getParameter("id") == null) {

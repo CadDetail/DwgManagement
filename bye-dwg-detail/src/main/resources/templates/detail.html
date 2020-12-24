@@ -40,8 +40,8 @@
 	                <div class="card card-info card-outline">
 			          <div class="card-header">
 						    <div class="float-right">						    
-						    	<div class="d-inline ml-1" shiro:hasAnyPermissions="detail:add"><button class="btn btn-info" type="button" id="btnNewDetail" onclick="newDetail()"><i class="fa fa-cog mr-1"></i>新增明细</button></div>
-						    	<div class="d-inline ml-1" shiro:hasAnyPermissions="detail:export,detail:print"><button class="btn btn-secondary" type="button" id="btnExportDetail"><i class="fa fa-download mr-1"></i>导出到Excel</button></div>
+						    	<div class="d-inline ml-1" shiro:hasAnyPermissions="system:all,detail:add"><button class="btn btn-info" type="button" id="btnNewDetail" onclick="newDetail()"><i class="fa fa-cog mr-1"></i>新增明细</button></div>
+						    	<div class="d-inline ml-1" shiro:hasAnyPermissions="system:all,detail:export,detail:print"><button class="btn btn-secondary" type="button" id="btnExportDetail"><i class="fa fa-download mr-1"></i>导出到Excel</button></div>
 						    </div>
 			          </div>
 			          <!-- 这里放各tabs列出的明细表格 -->

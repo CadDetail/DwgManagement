@@ -34,10 +34,10 @@
                             var htmlOpt = "<div class='d-flex justify-content-end'>";
                             htmlOpt += "     <div class='btn-group btn-group-sm'>";
                             var permissions = sessionStorage.getItem("permissions");
-                            if(permissions.indexOf("materialfeature:edit") != -1) {
+                            if(permissions.indexOf("system:all") != -1 || permissions.indexOf("materialfeature:edit") != -1) {
                                 htmlOpt += "<button type='button' class='btn btn-info' onclick='editMaterialfeature(" + JSON.stringify(row) + ")'><i class='fas fa-pencil-alt mr-1'></i></button>";
                             }
-                            if(permissions.indexOf("materialfeature:del") != -1) {
+                            if(permissions.indexOf("system:all") != -1 || permissions.indexOf("materialfeature:del") != -1) {
                                 htmlOpt += "<button type='button' class='btn btn-danger' onclick='deleteMaterialfeature(" + row.formulaId + ")'><i class='fas fa-trash mr-1'></i></button>";
                             }
                             htmlOpt += "  </div>";

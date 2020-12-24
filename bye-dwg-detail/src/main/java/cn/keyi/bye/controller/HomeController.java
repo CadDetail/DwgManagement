@@ -91,55 +91,55 @@ public class HomeController {
     }	
 
 	@RequestMapping("/user")
-	@RequiresPermissions("user:view")
+	@RequiresPermissions(value={"system:all","user:view"},logical=Logical.OR)
     public String user() {
         return "user";
     }
 	
 	@RequestMapping("/role")
-	@RequiresPermissions("role:view")
+	@RequiresPermissions(value={"system:all","role:view"},logical=Logical.OR)
     public String role() {
         return "role";
     }
 	
 	@RequestMapping("/permission")
-	@RequiresPermissions("permission:view")
+	@RequiresPermissions(value={"system:all","permission:view"},logical=Logical.OR)
     public String permission() {
         return "permission";
     }
 	
 	@RequestMapping("/artifact")
-	@RequiresPermissions("artifact:view")
+	@RequiresPermissions(value={"system:all","artifact:view"},logical=Logical.OR)
     public String artifact() {
         return "artifact";
     }
 	
 	@RequestMapping("/detail")
-	@RequiresPermissions("detail:view")
+	@RequiresPermissions(value={"system:all","detail:view"},logical=Logical.OR)
     public String detail() {
         return "detail";
     }
 	
 	@RequestMapping("/importdetail")
-	@RequiresPermissions("detail:import")
+	@RequiresPermissions(value={"system:all","detail:import"},logical=Logical.OR)
     public String importdetail() {
         return "importdetail";
     }
 	
 	@RequestMapping("/materialfeature")
-	@RequiresPermissions("materialfeature:view")
+	@RequiresPermissions(value={"system:all","materialfeature:view"},logical=Logical.OR)
     public String materialfeature() {
         return "materialfeature";
     }
 	
 	@RequestMapping("/workingsteps")
-	@RequiresPermissions(value={"workingsteps:view","detail:check"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","workingsteps:view","detail:check"},logical=Logical.OR)
     public String workingsteps() {
         return "workingsteps";
     }
 	
 	@RequestMapping("/needsplitprefix")
-	@RequiresPermissions("needsplitprefix:view")
+	@RequiresPermissions(value={"system:all","needsplitprefix:view"},logical=Logical.OR)
     public String needsplitprefix() {
         return "needsplitprefix";
     }

@@ -152,13 +152,13 @@
 			          innerHtml += '          </p>';			          
 			          innerHtml += '          <div class="d-flex justify-content-end">';
 			          innerHtml += '            <div class="btn-group btn-group-sm">';
-			          if(permissions.indexOf("user:edit") != -1 || permissions.indexOf("user:add") != -1) {
+			          if(permissions.indexOf("system:all") != -1 || permissions.indexOf("user:edit") != -1 || permissions.indexOf("user:add") != -1) {
 			          	innerHtml += "            <button type='button' class='btn btn-secondary' onclick='resetPassword(" + item.userId + ")'><i class='fas fa-key mr-1'></i></button>";
 			          }
-			          if(permissions.indexOf("user:edit") != -1) {
+			          if(permissions.indexOf("system:all") != -1 || permissions.indexOf("user:edit") != -1) {
 			          	innerHtml += "            <button type='button' class='btn btn-info' onclick='editUser(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt mr-1'></i></button>";
 			          }
-			          if(permissions.indexOf("user:del") != -1) {
+			          if(permissions.indexOf("system:all") != -1 || permissions.indexOf("user:del") != -1) {
 			          	innerHtml += "            <button type='button' class='btn btn-danger' onclick='deleteUser(" + item.userId + ")'><i class='fas fa-trash mr-1'></i></button>";
 			          }
 			          innerHtml += '            </div>';

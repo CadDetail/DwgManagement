@@ -110,7 +110,7 @@ public class SysUserController {
     }
 	
 	@RequestMapping("/getUsers")
-	@RequiresPermissions("user:view")
+	@RequiresPermissions(value={"system:all","user:view"},logical=Logical.OR)
 	public Object getUsers(HttpServletRequest request) {
 		Integer pageNumber = Integer.valueOf(request.getParameter("pageNumber")) - 1;
 		Integer pageSize = Integer.valueOf(request.getParameter("pageSize"));
@@ -123,7 +123,7 @@ public class SysUserController {
 	}
 	
 	@RequestMapping("/saveUser")
-	@RequiresPermissions(value={"user:add","user:edit"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","user:add","user:edit"},logical=Logical.OR)
 	public Object saveUser(HttpServletRequest request) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		SysUser user = null;
@@ -178,7 +178,7 @@ public class SysUserController {
 	}
 	
 	@RequestMapping("/deleteUser")
-	@RequiresPermissions("user:del")
+	@RequiresPermissions(value={"system:all","user:del"},logical=Logical.OR)
 	public Object deleteUser(Long userId) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		String rslt = sysUserService.deleteUser(userId);
@@ -193,7 +193,7 @@ public class SysUserController {
 	}
 	
 	@RequestMapping("/resetPassword")
-	@RequiresPermissions(value={"user:add","user:edit"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","user:add","user:edit"},logical=Logical.OR)
 	public Object resetPassword(HttpServletRequest request, @RequestBody JSONObject params) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		SysUser user = null;

@@ -27,13 +27,13 @@ public class NeedsplitprefixController {
 	NeedsplitprefixService needsplitprefixService;
 	
 	@RequestMapping("/findNeedsplitprefix")
-	@RequiresPermissions("needsplitprefix:view")
+	@RequiresPermissions(value={"system:all","needsplitprefix:view"},logical=Logical.OR)
 	public List<Needsplitprefix> findNeedsplitprefix() {
 		return needsplitprefixService.getNeedsplitprefixs();
 	}
 	
 	@RequestMapping("/saveNeedsplitprefix")
-	@RequiresPermissions(value={"workingsteps:add","workingsteps:edit"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","needsplitprefix:add","needsplitprefix:edit"},logical=Logical.OR)
 	public Object saveNeedsplitprefix(HttpServletRequest request) {
 		Subject subject = SecurityUtils.getSubject();
 		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
@@ -67,7 +67,7 @@ public class NeedsplitprefixController {
 	}
 	
 	@RequestMapping("/deleteNeedsplitprefix")
-	@RequiresPermissions("workingsteps:del")
+	@RequiresPermissions(value={"system:all","needsplitprefix:del"},logical=Logical.OR)
 	public Object deleteNeedsplitprefix(Long prefixId) {
 		Map<String,Object> map = new HashMap<String, Object>();
 		String rslt = needsplitprefixService.deleteNeedsplitprefix(prefixId);

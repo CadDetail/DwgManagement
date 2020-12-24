@@ -103,10 +103,10 @@
 			          innerHtml += '          <div class="card-body">';
 			          innerHtml += '            <div class="d-flex justify-content-center">';
 			          innerHtml += '              <div class="btn-group btn-group-sm">';
-			          if(permissions.indexOf("role:edit") != -1) {
+			          if(permissions.indexOf("system:all") != -1 || permissions.indexOf("role:edit") != -1) {
 			          	innerHtml += "            <button type='button' class='btn btn-info' onclick='editRole(" + JSON.stringify(item) + ")'><i class='fas fa-pencil-alt'></i></button>";
 			          }
-			          if(permissions.indexOf("role:del") != -1) {
+			          if(permissions.indexOf("system:all") != -1 || permissions.indexOf("role:del") != -1) {
 			          	innerHtml += "            <button type='button' class='btn btn-danger' onclick='deleteRole(" + item.roleId + ")'><i class='fas fa-trash'></i></button>";
 			          }
 			          innerHtml += '              </div>';

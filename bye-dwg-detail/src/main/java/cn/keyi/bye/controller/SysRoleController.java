@@ -33,13 +33,13 @@ public class SysRoleController {
 	
 	// 获取所有角色列表
 	@RequestMapping("/getAllRoles")
-	@RequiresPermissions(value={"user:view","role:view"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","user:view","role:view"},logical=Logical.OR)
 	public Object getAllRoles() {
 		return sysRoleService.findAll();
 	}
 	
 	@RequestMapping("/getRolesForSelect2")
-	@RequiresPermissions(value={"user:view","role:view"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","user:view","role:view"},logical=Logical.OR)
 	public Object getRolesForSelect2() {		
 		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
 		List<SysRole> roleList = sysRoleService.findAll();
@@ -53,7 +53,7 @@ public class SysRoleController {
 	}
 	
 	@RequestMapping("/getRoles")
-	@RequiresPermissions("role:view")
+	@RequiresPermissions(value={"system:all","role:view"},logical=Logical.OR)
 	public Object getRoles(HttpServletRequest request) {
 		Integer pageNumber = Integer.valueOf(request.getParameter("pageNumber")) - 1;
 		Integer pageSize = Integer.valueOf(request.getParameter("pageSize"));
@@ -65,7 +65,7 @@ public class SysRoleController {
 	}
 	
 	@RequestMapping("/saveRole")
-	@RequiresPermissions(value={"role:add","role:edit"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","role:add","role:edit"},logical=Logical.OR)
 	public Object saveRole(HttpServletRequest request) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		SysRole role = null;
@@ -115,7 +115,7 @@ public class SysRoleController {
 	}
 	
 	@RequestMapping("/deleteRole")
-	@RequiresPermissions("role:del")
+	@RequiresPermissions(value={"system:all","role:del"},logical=Logical.OR)
 	public Object deleteRole(Long roleId) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		String rslt = sysRoleService.deleteRole(roleId);

@@ -50,7 +50,7 @@ public class ArtifactController {
 	 * @return
 	 */
 	@RequestMapping("/findArtifacts")
-	@RequiresPermissions("artifact:view")
+	@RequiresPermissions(value={"system:all","artifact:view"},logical=Logical.OR)
 	public Object findArtifacts(HttpServletRequest request) {
 		int draw = Integer.parseInt(request.getParameter("draw"));			// DataTable 要求要返回的参数
 		int pageNumber = Integer.parseInt(request.getParameter("start"));	// 记录起始编号
@@ -114,7 +114,7 @@ public class ArtifactController {
 	 * @return
 	 */
 	@RequestMapping("/findRecursiveDetail")
-	@RequiresPermissions("detail:view")
+	@RequiresPermissions(value={"system:all","detail:view"},logical=Logical.OR)
 	public List<Map<String, Object>> findRecursiveDetail(Long masterId) {
 		List<Map<String, Object>> listDetail = new ArrayList<Map<String, Object>>();
 		Artifact master = artifactService.getArtifactById(masterId);
@@ -133,6 +133,7 @@ public class ArtifactController {
 	 * @return
 	 */
 	@RequestMapping("/findSubDetails")
+	@RequiresPermissions(value={"system:all","detail:view"},logical=Logical.OR)
 	public List<Map<String, Object>> findSubDetails(Long masterId) {
 		List<Map<String, Object>> listDetail = new ArrayList<Map<String, Object>>();
 		Artifact master = artifactService.getArtifactById(masterId);
@@ -144,7 +145,7 @@ public class ArtifactController {
 	}
 	
 	@RequestMapping("/saveArtifact")
-	@RequiresPermissions(value={"artifact:add","artifact:edit"},logical=Logical.OR)
+	@RequiresPermissions(value={"system:all","artifact:add","artifact:edit"},logical=Logical.OR)
 	public Object saveArtifact(HttpServletRequest request) {
 		Subject subject = SecurityUtils.getSubject();
 		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
@@ -198,7 +199,7 @@ public class ArtifactController {
 	}
 	
 	@RequestMapping("/deleteArtifact")
-	@RequiresPermissions("artifact:del")
+	@RequiresPermissions(value={"system:all","artifact:del"},logical=Logical.OR)
 	public Object deleteArtifact(Long artifactId) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		String rslt = artifactService.deleteArtifact(artifactId);
@@ -213,7 +214,7 @@ public class ArtifactController {
 	}
 	
 	@RequestMapping("/importArtifact")
-	@RequiresPermissions("detail:import")
+	@RequiresPermissions(value={"system:all","detail:import"},logical=Logical.OR)
 	public Object importArtifact(HttpServletRequest request) {		
 		int mode = Integer.valueOf(request.getParameter("conflictMode"));
 		String mdbPhysicalFile = request.getParameter("fileAtSrvr");		
@@ -231,7 +232,7 @@ public class ArtifactController {
 					partPrefix.add(prefix.getPrefixLabel());
 				}
 			}
-			// 从Access文件中获取 MXBTL 表中存放的零件列表
+			// 从Access文件中获取 MXBTL表中存放的零件列表
 			List<Artifact> artifacts = accessService.getArtifacts(mdbPhysicalFile, productPrefix, partPrefix);
 			HashSet<String> needSplitPrefix = new HashSet<String>();
 			needSplitPrefix.clear();
@@ -239,11 +240,30 @@ public class ArtifactController {
 			needSplitPrefix.addAll(partPrefix);
 			// 从Access文件中获取 MXSHUJU 表中存放的明细列表
 			List<Map<String, Object>> details = accessService.getArtifactDetail(mdbPhysicalFile, needSplitPrefix);
-			rslt = accessService.batchImportArtifactDetail(artifacts, details, mode, productPrefix);			
-			if(rslt == 1) {
-				map.put("message", "明细数据导入成功！");
-			} else {
-				map.put("message", "明细数据导入失败！");
+			// ① 从Access文件的 MXSHUJU表中获取明细的所属图号和图号，用于③
+			HashSet<String> masterCodes = new HashSet<String>();
+			HashSet<String> slaveCodes = new HashSet<String>();
+			for(Map<String, Object> detail : details) {
+				masterCodes.add(detail.get("parentCode").toString());
+				slaveCodes.add(detail.get("sonCode").toString());
+			}
+			// ② 在图号列表中加入MXBTL表中的图号，用于③
+			for(Artifact artifact : artifacts) {
+				slaveCodes.add(artifact.getArtifactCode());
+			}
+			// ③ 判断明细中所属图号对应的组件是否在Access明细表中或在数据库中
+			List<String> unfounds = accessService.getUnfoundArtifactCodes(new ArrayList<String>(masterCodes), 
+					new ArrayList<String>(slaveCodes), productPrefix);
+			if(unfounds.size() == 0) {
+				// 开始批量导入明细
+				rslt = accessService.batchImportArtifactDetail(artifacts, details, mode, productPrefix);			
+				if(rslt == 1) {
+					map.put("message", "明细数据导入成功！");
+				} else {
+					map.put("message", "明细数据导入失败！");
+				}
+			} else { // 存在不在表中或库中的所属图号
+				map.put("message", "请先导入不在库中的零件，它们是：" + String.join("、", unfounds));
 			}
 		} catch (Exception e) {
 			map.put("message", e.getMessage());

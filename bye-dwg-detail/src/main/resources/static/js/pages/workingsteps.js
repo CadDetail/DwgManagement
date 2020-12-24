@@ -52,7 +52,7 @@
                 		html += '    <div class="icon">';
                 		html += '      <i class="ion ion-hammer"></i>';
                 		html += '    </div>';
-                		if(permissions.indexOf("workingsteps:del") != -1) {
+                		if(permissions.indexOf("system:all") != -1 || permissions.indexOf("workingsteps:del") != -1) {
 	                		html += '    <a href="#" class="small-box-footer" onclick="deleteWorkingsteps(' + item.stepId + ')">';
 	                		html += '      删除 ';
 	                		html += '    </a>';
