@@ -8,7 +8,21 @@
 				type: "POST",
 				url:  "/permissionInfo/getPermissionsForSelect2",
 				success: function(result) {
-					$('.select2bs4').select2({
+					$('#dlgRolePermission').select2({
+						theme: 'bootstrap4',
+						data: result
+					});
+				},
+				dataType: "json"
+			});
+		}
+		
+		function getAllWorkingsteps() {
+			$.ajax({
+				type: "POST",
+				url:  "/workingsteps/getWorkingstepsForSelect2",
+				success: function(result) {
+					$('#dlgRoleWorkingsteps').select2({
 						theme: 'bootstrap4',
 						data: result
 					});
@@ -18,10 +32,16 @@
 		}
 		
 		function refreshSelect2() {
-			$('.select2bs4').select2({
+			$('#dlgRolePermission').select2({
 				theme: 'bootstrap4',
 				language: 'zh-CN',
 				placeholder: '请选择权限',
+				allowClear: true
+			});
+			$('#dlgRoleWorkingsteps').select2({
+				theme: 'bootstrap4',
+				language: 'zh-CN',
+				placeholder: '请选择工序',
 				allowClear: true
 			});
 		}
@@ -47,7 +67,9 @@
 			$.each(role.permissions, function(index, item) {
 				permissionlist.push(item.permissionCode);
 			});
-			$(".select2bs4").val(permissionlist);
+			$("#dlgRolePermission").val(permissionlist);
+			let steps = role.workingsteps == null ? "" : role.workingsteps;
+			$("#dlgRoleWorkingsteps").val(steps.split(","));
 			$(".select2bs4").trigger('change');
 			$("#dlgRoleTitle").html("编辑角色");
 			$("#modal-role").modal("show"); 			
@@ -98,7 +120,8 @@
 			          innerHtml += '  <div class="card mb-3 h-100">';
 			          innerHtml += '	<div class="row no-gutters">';
 			          innerHtml += '	  <div class="col-md-4">';
-			          innerHtml += '	       <img src="/img/role.png" class="card-img" alt="' + item.description + '">';
+			          innerHtml += '	      <img src="/img/role.png" class="card-img" alt="' + item.description + '"><br>';
+			          innerHtml += '	      <div class="d-flex justify-content-center">' + item.description + '</div>';
 			          
 			          innerHtml += '          <div class="card-body">';
 			          innerHtml += '            <div class="d-flex justify-content-center">';
@@ -116,16 +139,16 @@
 			          innerHtml += '      </div>';
 			          innerHtml += '      <div class="col-md-8">';	
 			          innerHtml += '        <div class="card-body">';
-			          innerHtml += '	         <h4>' + item.roleName + '</h4>';
+			          innerHtml += '	      <h4>' + item.roleName + '</h4>';
 			          innerHtml += '          <p class="card-text">';
-			          innerHtml += '            <span>角色：<small class="text-muted" id="lblname' + item.roleId + '">' + item.description + '</small></span><br>';
+			          //innerHtml += '            <span>角色：<small class="text-muted" id="lblname' + item.roleId + '">' + item.description + '</small></span><br>';			          			          
 			          let permissionlist = new Array();
 					  $.each(item.permissions, function(i, permission) {
 						  permissionlist.push(permission.permissionTitle);
 					  });
-			          innerHtml += '            <span>权限：<small class="text-muted" id="lblrole' + item.roleId + '">' + permissionlist.join("，") + '</small></span>';
-			          innerHtml += '          </p>';
-			          
+			          innerHtml += '            <span>权限：<small class="text-muted" id="lblrole' + item.roleId + '">' + permissionlist.join("，") + '</small></span><br>'; 
+			          innerHtml += '            <span>查询明细时的可见工序：<small class="text-muted" id="lblworkingsteps' + item.roleId + '">' + (item.workingsteps) + '</small></span>';
+			          innerHtml += '          </p>';			          
 			          innerHtml += '        </div>';
 			          innerHtml += '      </div>';
 			          innerHtml += '    </div>';			          
@@ -156,6 +179,8 @@
 			});
 			// 获取所有权限列表
 			getAllPermissions();
+			// 获取所有工序列表
+			getAllWorkingsteps();
 			// 对话框加载完毕事件
 			$('#modal-role').on('shown.bs.modal', function (e) {
 				// Refresh Select2 Elements
@@ -166,6 +191,7 @@
 				var roleName  = $("#dlgRoleName").val();
  				var roleAlias = $("#dlgRoleAlias").val();
  				var rolePermissions = $("#dlgRolePermission").select2("data");
+ 				var roleWorkingsteps = $("#dlgRoleWorkingsteps").select2("data");
  				if(roleName == "" || roleAlias == "") {
  					myAlert("数据输入不完整！")
  					return;
@@ -173,11 +199,16 @@
  				var permissionIds = new Array();
  				$.each(rolePermissions, function (index, item) {
  					permissionIds.push(item.id);
- 				}); 				
+ 				}); 
+ 				var workingstepIds = new Array();
+ 				$.each(roleWorkingsteps, function (index, item) {
+ 					workingstepIds.push(item.id);
+ 				});
 				$.ajax({
 					type: "POST",
 					url:  saveRoleUrl,
-					data: {roleName: roleName, description: roleAlias, rolePermission: permissionIds.join(",")},
+					data: { roleName: roleName, description: roleAlias, 
+						    rolePermission: permissionIds.join(","), workingsteps: workingstepIds.join(",")},
 					error: function() {
 						myAlert("出错啦，☹");
 					},

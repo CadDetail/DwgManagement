@@ -283,7 +283,8 @@
 			$.ajax({
 				type: "GET",
 				// url:  "/artifact/findRecursiveDetail",
-				url:  "/artifact/findSubDetails",
+				// url:  "/artifact/findSubDetails",
+				url:  "/artifact/findSubDetailsWithWorkingsteps",
 				data: {masterId: masterId},
 				success: function(result) {						
 					var navitem = '<ul class="nav nav-tabs" id="tabDetail" role="tablist">';
@@ -334,7 +335,7 @@
 				loadQuotaformula();
 				// 为导出按钮添加事件
 				$('#btnExportDetail').click(function() {
-					var url = "/export/exportDetail?masterId=" + masterId;
+					var url = "/export/exportDetailWithWorkingsteps?masterId=" + masterId;
 					Swal.fire({
 						  title: '明细导出到Excel',
 						  text: "导出操作可能会消耗较长时间，确定导出？",
@@ -406,7 +407,8 @@
  				var dimension = $("#dlgDimension").val();
  				var unit = $("#dlgUnit").val();
  				var quota =$("#dlgQuota").val();
- 				if(dimension == "" || quota == "") {
+ 				var workingstep = $("#dlgWorkingSteps").val();
+ 				if(dimension == "" || quota == "" || workingstep == "") {
  					myAlert("会签数据输入不完整！")
  					return;
  				}

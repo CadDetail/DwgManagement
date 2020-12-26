@@ -19,6 +19,8 @@ public class SysRole implements Serializable {
 	private String roleName;
 	// 角色别名，用于在 UI 中显示
 	private String description;
+	// 此角色可查询的已经会签过的指定工序的明细
+	private String workingsteps;
 	// 是否可用
 	@Column(name = "roleAvailable")
 	private Boolean roleAvailable = Boolean.TRUE;	
@@ -51,6 +53,12 @@ public class SysRole implements Serializable {
 	}
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	public String getWorkingsteps() {
+		return workingsteps;
+	}
+	public void setWorkingsteps(String workingsteps) {
+		this.workingsteps = workingsteps;
 	}
 	public Boolean getRoleAvailable() {
 		return roleAvailable;

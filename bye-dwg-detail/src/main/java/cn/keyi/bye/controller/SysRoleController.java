@@ -38,6 +38,7 @@ public class SysRoleController {
 		return sysRoleService.findAll();
 	}
 	
+	// 适配于Select2控件的角色列表
 	@RequestMapping("/getRolesForSelect2")
 	@RequiresPermissions(value={"system:all","user:view","role:view"},logical=Logical.OR)
 	public Object getRolesForSelect2() {		
@@ -95,14 +96,22 @@ public class SysRoleController {
 		// 新增和修改模式下，都需要设置角色别名、拥有权限		
 		role.setDescription(request.getParameter("description"));		
 		String permissions = request.getParameter("rolePermission");
+		if(permissions.contains(SysRoleService.ALL_PERMISSIONS)) {
+			permissions = SysRoleService.ALL_PERMISSIONS;
+		}
 		List<SysPermission> permissionList = new ArrayList<SysPermission>();
 		for(String permissionCode: permissions.split(",")) {
 			SysPermission permission = sysPermissionService.getPermissionByCode(permissionCode);
 			if(permission != null) {
 				permissionList.add(permission);
 			}
-		}	
+		}
 		role.setPermissions(permissionList);
+		String workingsteps = request.getParameter("workingsteps");
+		if(workingsteps.contains(SysRoleService.ALL_WORKINGSTEPS)) {
+			workingsteps = SysRoleService.ALL_WORKINGSTEPS;
+		}
+		role.setWorkingsteps(workingsteps);		
 		String rslt = sysRoleService.saveRole(role);
 		if(rslt.isEmpty()) {
 			map.put("status", 1);

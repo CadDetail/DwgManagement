@@ -1,6 +1,7 @@
 package cn.keyi.bye.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.keyi.bye.model.CookieUser;
 import cn.keyi.bye.model.Workingsteps;
+import cn.keyi.bye.service.SysRoleService;
 import cn.keyi.bye.service.WorkingstepsService;
 
 @RestController
@@ -30,6 +32,24 @@ public class WorkingstepsController {
 	@RequiresPermissions(value={"system:all","workingsteps:view","detail:check"},logical=Logical.OR)
 	public List<Workingsteps> findWorkingsteps() {
 		return workingstepsService.getAllWorkingsteps();
+	}
+	
+	@RequestMapping("/getWorkingstepsForSelect2")
+	@RequiresPermissions(value={"system:all","role:view","workingsteps:view"},logical=Logical.OR)
+	public Object getWorkingstepsForSelect2() {		
+		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+		List<Workingsteps> workingstepList = workingstepsService.getAllWorkingsteps();
+		Map<String, Object> all = new HashMap<String, Object>();
+		all.put("id", SysRoleService.ALL_WORKINGSTEPS);
+		all.put("text", SysRoleService.ALL_WORKINGSTEPS);
+		items.add(all);
+		for(Workingsteps step: workingstepList) {
+			Map<String, Object> item = new HashMap<String, Object>();
+			item.put("id", step.getStepName());
+			item.put("text", step.getStepName());
+			items.add(item);
+		}
+		return items;
 	}
 	
 	@RequestMapping("/saveWorkingsteps")

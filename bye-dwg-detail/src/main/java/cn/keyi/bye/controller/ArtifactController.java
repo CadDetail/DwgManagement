@@ -2,6 +2,7 @@ package cn.keyi.bye.controller;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,10 +25,12 @@ import cn.keyi.bye.model.Artifact;
 import cn.keyi.bye.model.ArtifactDetail;
 import cn.keyi.bye.model.CookieUser;
 import cn.keyi.bye.model.Needsplitprefix;
+import cn.keyi.bye.model.SysRole;
 import cn.keyi.bye.service.AccessService;
 import cn.keyi.bye.service.ArtifactDetailService;
 import cn.keyi.bye.service.ArtifactService;
 import cn.keyi.bye.service.NeedsplitprefixService;
+import cn.keyi.bye.service.SysRoleService;
 
 @RestController
 @RequestMapping("/artifact")
@@ -41,6 +44,8 @@ public class ArtifactController {
 	AccessService accessService;
 	@Autowired
 	NeedsplitprefixService needsplitprefixService;
+	@Autowired
+	SysRoleService sysRoleService;
 	
 	/**
 	 * comment: 以分页的方式查询产品（工件）列表
@@ -142,6 +147,59 @@ public class ArtifactController {
 			listDetail = artifactDetailService.getDetailByMaster(master, times);
 		}
 		return listDetail;
+	}
+	
+	@RequestMapping("/findSubDetailsWithWorkingsteps")
+	@RequiresPermissions(value={"system:all","detail:view"},logical=Logical.OR)
+	public List<Map<String, Object>> findSubDetailsWithWorkingsteps(Long masterId) {
+		List<Map<String, Object>> listDetail = new ArrayList<Map<String, Object>>();
+		Artifact master = artifactService.getArtifactById(masterId);
+		int times = 1;	// 初始倍数置为1, 即最开始要遍历下级零件的产品看成是1件
+		if(master != null) {			
+			listDetail = artifactDetailService.getDetailByMaster(master, times);
+		}
+		// 取得当前登录用户的所属角色所包含的查询明细时可查询的工序列表
+		Subject subject = SecurityUtils.getSubject();
+		CookieUser cookieUser = (CookieUser) subject.getPrincipal();
+		HashSet<String> roleList = cookieUser.getRoleList();		
+		String steps = "";
+		for(String roleName : roleList) {
+			SysRole role = sysRoleService.findByRoleName(roleName);
+			String tmp = role.getWorkingsteps();
+			steps += tmp == null ? "" : tmp;			
+		}
+		HashSet<String> stepSet = new HashSet<String>(Arrays.asList(steps.split(",")));
+		// 重新整理listDetail，过滤没有查询权限的明细
+		HashSet<Long> removeTab = new HashSet<Long>();
+		List<Map<String, Object>> newListDetail = new ArrayList<Map<String, Object>>();
+		for(Map<String, Object> tab : listDetail) {
+			Map<String, Object> newTab = new HashMap<String, Object>();
+			newTab.put("artifact", tab.get("artifact"));
+			newTab.put("times", tab.get("times"));
+			newTab.put("weight", tab.get("weight"));
+			@SuppressWarnings("unchecked")
+			List<ArtifactDetail> details = (List<ArtifactDetail>) tab.get("detail");
+			List<ArtifactDetail> newDetails = new ArrayList<ArtifactDetail>();
+			for(ArtifactDetail item : details) {
+				// 没有查询权限，即用户可查询的工序列表中未出现明细的工序
+				if(!stepSet.contains(item.getWorkingSteps()) && !stepSet.contains(SysRoleService.ALL_WORKINGSTEPS)) {
+					removeTab.add(item.getSlave().getArtifactId());	// 记录需要从Tab移除的零件ID
+				} else {
+					newDetails.add(item);
+				}
+			}
+			newTab.put("detail", newDetails);
+			newListDetail.add(newTab);
+		}
+		// 移除没有查询权限的需要放在Tab卡中的零件
+		List<Map<String, Object>> rlstListDetail = new ArrayList<Map<String, Object>>();
+		for(Map<String, Object> tab : newListDetail) {
+			Artifact artifact = (Artifact) tab.get("artifact");
+			if(!removeTab.contains(artifact.getArtifactId())) {
+				rlstListDetail.add(tab);
+			}
+		}
+		return rlstListDetail;
 	}
 	
 	@RequestMapping("/saveArtifact")

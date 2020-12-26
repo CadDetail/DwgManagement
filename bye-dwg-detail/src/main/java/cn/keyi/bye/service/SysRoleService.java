@@ -11,6 +11,9 @@ import cn.keyi.bye.model.SysRole;
 
 @Service
 public class SysRoleService {
+	
+	public static final String ALL_PERMISSIONS  = "system:all";	// 所有权限
+	public static final String ALL_WORKINGSTEPS = "所有工序";		// 所有工序
 
 	@Autowired
 	SysRoleDao sysRoleDao;

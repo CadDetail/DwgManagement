@@ -26,6 +26,7 @@ public class SysPermissionController {
 	@Autowired
 	SysPermissionService sysPermissionService;
 	
+	// 适配于Select2控件的权限列表
 	@RequestMapping("/getPermissionsForSelect2")
 	@RequiresPermissions(value={"system:all","role:view","permission:view"},logical=Logical.OR)
 	public Object getPermissionsForSelect2() {		

@@ -95,21 +95,28 @@
 		            <form class="form-horizontal" id="frmRole">
 		                <div class="card-body">
 		                  <div class="form-group row">
-		                    <label for="dlgRoleName" class="col-sm-2 col-form-label">角色</label>
-		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control is-warning" id="dlgRoleName" placeholder="角色">
+		                    <label for="dlgRoleName" class="col-sm-3 col-form-label">内部名称</label>
+		                    <div class="col-sm-9">
+		                      <input type="text" class="form-control is-warning" id="dlgRoleName" placeholder="角色内部名称">
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
-		                    <label for="dlgRoleAlias" class="col-sm-2 col-form-label">别名</label>
-		                    <div class="col-sm-10">
-		                      <input type="text" class="form-control is-warning" id="dlgRoleAlias" placeholder="别名">
+		                    <label for="dlgRoleAlias" class="col-sm-3 col-form-label">角色称呼</label>
+		                    <div class="col-sm-9">
+		                      <input type="text" class="form-control is-warning" id="dlgRoleAlias" placeholder="角色显示称呼">
 		                    </div>
 		                  </div>
 		                  <div class="form-group row">
-		                    <label for="dlgRolePermission" class="col-sm-2 col-form-label">权限</label>
-		                    <div class="col-sm-10">
+		                    <label for="dlgRolePermission" class="col-sm-3 col-form-label">拥有权限</label>
+		                    <div class="col-sm-9">
 		                      <select class="select2bs4" multiple="multiple" id="dlgRolePermission" style="width: 100%;">
+		                      </select>
+		                    </div>
+		                  </div>
+		                  <div class="form-group row">
+		                    <label for="dlgRoleWorkingsteps" class="col-sm-3 col-form-label">明细可查工序</label>
+		                    <div class="col-sm-9">
+		                      <select class="select2bs4" multiple="multiple" id="dlgRoleWorkingsteps" style="width: 100%;">
 		                      </select>
 		                    </div>
 		                  </div>		                  
