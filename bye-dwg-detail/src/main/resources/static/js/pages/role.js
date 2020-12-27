@@ -147,7 +147,7 @@
 						  permissionlist.push(permission.permissionTitle);
 					  });
 			          innerHtml += '            <span>权限：<small class="text-muted" id="lblrole' + item.roleId + '">' + permissionlist.join("，") + '</small></span><br>'; 
-			          innerHtml += '            <span>查询明细时的可见工序：<small class="text-muted" id="lblworkingsteps' + item.roleId + '">' + (item.workingsteps) + '</small></span>';
+			          innerHtml += '            <span>明细可查工序：<small class="text-muted" id="lblworkingsteps' + item.roleId + '">' + (item.workingsteps) + '</small></span>';
 			          innerHtml += '          </p>';			          
 			          innerHtml += '        </div>';
 			          innerHtml += '      </div>';
